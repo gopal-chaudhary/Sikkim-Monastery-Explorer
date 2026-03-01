@@ -2,9 +2,6 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import {
   MapPin,
-  Mountain,
-  Heart,
-  Compass,
   Star,
   Users,
   Sparkles,
@@ -14,29 +11,14 @@ import { Layout } from '../components/Layout'
 import { Marquee } from '../components/Marquee'
 import { ScrollReveal } from '../components/ScrollReveal'
 import { AnimatedCounter } from '../components/AnimatedCounter'
-
-const HERO_IMAGE = 'https://www.esikkimtourism.in/wp-content/uploads/2018/10/climate-bnnr.jpg'
-const QUOTE_IMAGE = 'https://images.unsplash.com/photo-1569929233549-b8b683d52551?w=1200&q=80'
-
-const FEATURED = [
-  { id: 1, name: 'Rumtek Monastery', region: 'East Sikkim', established: 1740, rating: 4.8, image: 'https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?w=600&q=80', tag: 'Golden Stupa' },
-  { id: 2, name: 'Pemayangtse Monastery', region: 'West Sikkim', established: 1705, rating: 4.7, image: 'https://images.unsplash.com/photo-1591825378301-2e65e50d6837?w=600&q=80', tag: 'Ancient Art' },
-  { id: 3, name: 'Enchey Monastery', region: 'East Sikkim', established: 1840, rating: 4.6, image: 'https://images.unsplash.com/photo-1548013146-72479768bada?w=600&q=80', tag: 'Chaam Dance' },
-  { id: 4, name: 'Tashiding Monastery', region: 'West Sikkim', established: 1717, rating: 4.9, image: 'https://images.unsplash.com/photo-1580407196238-dac33f57c410?w=600&q=80', tag: 'Panoramic Views' },
-  { id: 5, name: 'Dubdi Monastery', region: 'West Sikkim', established: 1701, rating: 4.8, image: 'https://images.unsplash.com/photo-1604329760661-e71dc83f8f26?w=600&q=80', tag: 'Oldest in Sikkim' },
-  { id: 6, name: 'Ralang Monastery', region: 'South Sikkim', established: 1768, rating: 4.5, image: 'https://images.unsplash.com/photo-1609137144813-7d9921338f24?w=600&q=80', tag: 'Peaceful Gardens' },
-]
-
-const EXPERIENCE = [
-  { icon: Mountain, title: 'Sacred Peaks', desc: 'Monasteries perched among Himalayan peaks. Silence, prayer flags, and timeless rituals.', image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&q=80' },
-  { icon: Heart, title: 'Inner Peace', desc: 'Meditation halls, chanting, and the warmth of monastic hospitality. Leave the noise behind.', image: 'https://images.unsplash.com/photo-1580407196238-dac33f57c410?w=600&q=80' },
-  { icon: Compass, title: 'Guided Journeys', desc: 'Curated travel guides, nearby stays, and best routes. Plan your visit with confidence.', image: 'https://images.unsplash.com/photo-1591825378301-2e65e50d6837?w=600&q=80' },
-]
+import { useMonasteries } from '../context/MonasteryContext'
+import { HERO_IMAGE, QUOTE_IMAGE, EXPERIENCE } from '../constants'
 
 export default function Home() {
   const [search, setSearch] = useState('')
   const [region, setRegion] = useState('all')
   const navigate = useNavigate()
+  const { monasteries } = useMonasteries()
 
   const handleExplore = (e) => {
     e.preventDefault()
@@ -45,6 +27,9 @@ export default function Home() {
     if (region && region !== 'all') params.set('region', region)
     navigate(`/explore${params.toString() ? '?' + params.toString() : ''}`)
   }
+
+  // Get first 6 monasteries for featured section, sorted by rating
+  const featured = monasteries.slice(0, 6)
 
   return (
     <Layout noHero>
@@ -121,32 +106,32 @@ export default function Home() {
                 <p className="text-amber-500/90 text-sm tracking-[0.15em] uppercase mb-2">Curated for you</p>
                 <h3 className="font-heading text-3xl sm:text-4xl md:text-5xl font-bold text-amber-50">Featured monasteries</h3>
               </div>
-              <Link to="/explore" className="text-amber-400 hover:text-amber-300 text-sm">View all →</Link>
             </div>
           </ScrollReveal>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
-            {FEATURED.slice(0, 6).map((m, i) => (
-              <ScrollReveal key={m.id} delay={i * 0.08}>
-                <Link to="/explore" className="card-shine group rounded-2xl overflow-hidden bg-stone-900/60 border border-amber-900/30 hover:border-amber-700/50 transition-all duration-300 block hover:-translate-y-1">
-                <div className="relative aspect-[4/3] overflow-hidden">
-                  <img src={m.image} alt={m.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-stone-950 via-stone-950/20 to-transparent" />
-                  <div className="absolute top-3 right-3 flex items-center gap-1 px-2 py-1 rounded-full bg-stone-900/80 text-amber-400 text-xs font-medium">
-                    <Star className="w-3.5 h-3.5 fill-amber-400" /> {m.rating}
+            {featured.length > 0 ? featured.map((m, i) => (
+              <ScrollReveal key={m._id} delay={i * 0.08}>
+                <Link to={`/monastery/${m._id}`} className="card-shine group rounded-2xl overflow-hidden bg-stone-900/60 border border-amber-900/30 hover:border-amber-700/50 transition-all duration-300 block hover:-translate-y-1">
+                  <div className="relative aspect-[4/3] overflow-hidden">
+                    <img src={m.imageUrl || 'https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?w=600&q=80'} alt={m.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-stone-950 via-stone-950/20 to-transparent" />
+                    <div className="absolute top-3 right-3 flex items-center gap-1 px-2 py-1 rounded-full bg-stone-900/80 text-amber-400 text-xs font-medium">
+                      <Star className="w-3.5 h-3.5 fill-amber-400" /> {m.rating ?? '—'}
+                    </div>
+                    <div className="absolute bottom-3 left-3 right-3">
+                      <h4 className="font-heading text-xl sm:text-2xl font-bold text-amber-50">{m.name}</h4>
+                      <p className="text-stone-400 text-xs sm:text-sm flex items-center gap-1 mt-1"><MapPin className="w-3.5 h-3.5" /> {m.region} · Est. {m.established}</p>
+                    </div>
                   </div>
-                  <div className="absolute bottom-3 left-3 right-3">
-                    <span className="inline-block px-2 py-0.5 rounded bg-amber-500/90 text-stone-900 text-[10px] font-semibold uppercase tracking-wider">{m.tag}</span>
-                    <h4 className="font-heading text-xl sm:text-2xl font-bold text-amber-50 mt-2">{m.name}</h4>
-                    <p className="text-stone-400 text-xs sm:text-sm flex items-center gap-1 mt-1"><MapPin className="w-3.5 h-3.5" /> {m.region} · Est. {m.established}</p>
+                  <div className="p-4 flex items-center justify-between">
+                    <span className="text-stone-500 text-xs">View guide & book visit</span>
+                    <ChevronRight className="w-4 h-4 text-amber-500" />
                   </div>
-                </div>
-                <div className="p-4 flex items-center justify-between">
-                  <span className="text-stone-500 text-xs">View guide & book visit</span>
-                  <ChevronRight className="w-4 h-4 text-amber-500" />
-                </div>
-              </Link>
+                </Link>
               </ScrollReveal>
-            ))}
+            )) : (
+              <div className="col-span-full text-center py-8 text-stone-400">Loading monasteries...</div>
+            )}
           </div>
         </div>
       </section>
