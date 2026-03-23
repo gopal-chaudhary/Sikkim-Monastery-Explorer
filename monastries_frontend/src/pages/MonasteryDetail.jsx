@@ -1,15 +1,16 @@
 import { useState, useEffect } from 'react'
-import { useParams, useNavigate, Link } from 'react-router-dom'
+import { useParams, Link } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import { MapPin, Star, Hotel, Compass, BookOpen, Users, Church, Sparkles, Mountain, Clock, AlertTriangle, UserCircle, Phone, Mail, DollarSign, Award, Briefcase, Languages } from 'lucide-react'
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import { api, getErrorMessage, locationAPI, guideAPI } from '../api'
-import { useAuth } from '../context/AuthContext'
 import { Layout } from '../components/Layout'
 import ReviewSection from '../components/ReviewSection'
 import { SkeletonDetail } from '../components/SkeletonCard'
+import { SmartImage } from '../components/SmartImage'
+import { ErrorState, OfflineBanner } from '../components/States'
 
 const TYPE_META = {
   Hotel: { symbol: '🏨', color: '#3b82f6', label: 'Hotel' },
@@ -28,23 +29,28 @@ function getTypeMeta(type) {
 
 export default function MonasteryDetail() {
   const { id } = useParams()
-  const navigate = useNavigate()
-  const { user } = useAuth()
   const [monastery, setMonastery] = useState(null)
   const [travelGuide, setTravelGuide] = useState(null)
   const [userLocations, setUserLocations] = useState([])
   const [guides, setGuides] = useState([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
   const [guideLoading, setGuideLoading] = useState(false)
+  const online = typeof navigator !== 'undefined' ? navigator.onLine : true
 
   useEffect(() => {
     let cancelled = false
     async function fetchMonastery() {
       try {
+        setError(null)
         const { data } = await api.get(`/monasteries/${id}`)
         if (!cancelled) setMonastery(data.data)
       } catch (err) {
-        if (!cancelled) toast.error(getErrorMessage(err))
+        if (!cancelled) {
+          const message = getErrorMessage(err)
+          setError(message)
+          toast.error(message)
+        }
       } finally {
         if (!cancelled) setLoading(false)
       }
@@ -93,9 +99,10 @@ export default function MonasteryDetail() {
     return () => { cancelled = true }
   }, [id])
 
-  if (loading || !monastery) {
+  if (loading) {
     return (
       <Layout>
+        {!online && <OfflineBanner onRetry={() => window.location.reload()} />}
         <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
           <SkeletonDetail />
         </div>
@@ -103,12 +110,69 @@ export default function MonasteryDetail() {
     )
   }
 
+  if (!monastery) {
+    return (
+      <Layout>
+        {!online && <OfflineBanner onRetry={() => window.location.reload()} />}
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
+          <ErrorState
+            title="Monastery not found"
+            message={error || 'This monastery may have been removed or the link is incorrect.'}
+            onRetry={() => window.location.reload()}
+          />
+        </div>
+      </Layout>
+    )
+  }
+
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'TouristAttraction',
+    name: monastery.name,
+    description: monastery.description,
+    image: monastery.imageUrl,
+    address: {
+      '@type': 'PostalAddress',
+      addressLocality: monastery.location?.district || monastery.location?.village || '',
+      addressRegion: monastery.location?.state || monastery.region || 'Sikkim',
+      addressCountry: 'IN',
+    },
+    geo: monastery.coordinates?.latitude && monastery.coordinates?.longitude
+      ? {
+          '@type': 'GeoCoordinates',
+          latitude: monastery.coordinates.latitude,
+          longitude: monastery.coordinates.longitude,
+        }
+      : undefined,
+    sameAs: monastery.link || undefined,
+    aggregateRating: monastery.rating
+      ? {
+          '@type': 'AggregateRating',
+          ratingValue: monastery.rating,
+          bestRating: 5,
+          ratingCount: monastery.reviewCount || 1,
+        }
+      : undefined,
+  }
+
   return (
     <Layout>
+      {!online && <OfflineBanner onRetry={() => window.location.reload()} />}
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
         <div className="rounded-2xl overflow-hidden bg-stone-900/60 border border-amber-900/30 mb-8">
           <div className="relative aspect-[21/9] sm:aspect-[3/1]">
-            <img src={monastery.imageUrl || 'https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?w=1200'} alt={monastery.name} className="w-full h-full object-cover" />
+            <SmartImage
+              src={monastery.imageUrl || 'https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?w=1200'}
+              alt={monastery.name}
+              className="w-full h-full object-cover"
+              loading="eager"
+              fetchpriority="high"
+              optimizeWidth={1400}
+            />
             <div className="absolute inset-0 bg-gradient-to-t from-stone-950 via-transparent to-transparent" />
             <div className="absolute bottom-4 left-4 right-4 flex items-center gap-2">
               <span className="px-2 py-0.5 rounded bg-amber-500/90 text-stone-900 text-xs font-semibold">{monastery.region}</span>
@@ -417,10 +481,11 @@ export default function MonasteryDetail() {
                       <Popup>
                         <div className="text-sm max-w-xs">
                           {location.imageUrl && (
-                            <img 
-                              src={location.imageUrl} 
-                              alt={location.name} 
+                            <SmartImage
+                              src={location.imageUrl}
+                              alt={location.name}
                               className="w-full h-24 object-cover rounded mb-2"
+                              optimizeWidth={500}
                             />
                           )}
                           <p className="font-semibold text-sm">{location.name}</p>
@@ -500,10 +565,11 @@ export default function MonasteryDetail() {
                 <div key={guide._id} className="glass rounded-2xl p-5 border border-amber-900/30 hover:border-amber-700/50 transition">
                   <div className="flex items-start gap-4">
                     {guide.profilePhoto ? (
-                      <img
+                      <SmartImage
                         src={guide.profilePhoto}
                         alt={guide.guideName}
                         className="w-16 h-16 rounded-full object-cover border-2 border-amber-500"
+                        optimizeWidth={160}
                       />
                     ) : (
                       <div className="w-16 h-16 rounded-full bg-amber-900/50 flex items-center justify-center border-2 border-amber-500">

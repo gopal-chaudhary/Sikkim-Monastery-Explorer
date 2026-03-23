@@ -1,5 +1,7 @@
+/* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useState, useEffect } from 'react'
 import { api, getErrorMessage } from '../api'
+import { useOnlineStatus } from '../hooks/useOnlineStatus'
 
 const MonasteryContext = createContext(null)
 
@@ -7,6 +9,7 @@ export function MonasteryProvider({ children }) {
   const [monasteries, setMonasteries] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const online = useOnlineStatus()
 
   async function fetchAllMonasteries() {
     try {
@@ -30,7 +33,7 @@ export function MonasteryProvider({ children }) {
   }, [])
 
   return (
-    <MonasteryContext.Provider value={{ monasteries, loading, error, refetch: fetchAllMonasteries }}>
+    <MonasteryContext.Provider value={{ monasteries, loading, error, online, refetch: fetchAllMonasteries }}>
       {children}
     </MonasteryContext.Provider>
   )

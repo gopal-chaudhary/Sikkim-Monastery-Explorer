@@ -5,12 +5,17 @@ import { MapPin, Clock, CreditCard, Trash2, Edit2, RefreshCw, Plus } from 'lucid
 import { toast } from 'react-toastify'
 import { locationAPI } from '../api'
 import { useAuth } from '../context/AuthContext'
+import { EmptyState, ErrorState, OfflineBanner } from '../components/States'
+import { useOnlineStatus } from '../hooks/useOnlineStatus'
+import { SkeletonList } from '../components/SkeletonCard'
+import { SmartImage } from '../components/SmartImage'
 
 export default function MyLocations() {
   const { user } = useAuth()
   const navigate = useNavigate()
   const [locations, setLocations] = useState([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
   const [editingLocation, setEditingLocation] = useState(null)
   const [savingEdit, setSavingEdit] = useState(false)
   const [editForm, setEditForm] = useState({
@@ -25,6 +30,7 @@ export default function MyLocations() {
     imageUrl: ''
   })
   const [editImagePreview, setEditImagePreview] = useState(null)
+  const online = useOnlineStatus()
 
   useEffect(() => {
     if (!user) {
@@ -37,11 +43,13 @@ export default function MyLocations() {
   const fetchLocations = async () => {
     try {
       setLoading(true)
+      setError(null)
       const response = await locationAPI.getMyLocations()
       setLocations(response.data)
     } catch (error) {
       toast.error('Failed to fetch locations')
       console.error(error)
+      setError('Could not load your listings. Please try again.')
     } finally {
       setLoading(false)
     }
@@ -56,7 +64,7 @@ export default function MyLocations() {
       await locationAPI.deleteLocation(id)
       toast.success('Location deleted successfully')
       setLocations(locations.filter(loc => loc._id !== id))
-    } catch (error) {
+    } catch {
       toast.error('Failed to delete location')
     }
   }
@@ -66,7 +74,7 @@ export default function MyLocations() {
       await locationAPI.renewSubscription(id)
       toast.success('Subscription renewed successfully')
       fetchLocations()
-    } catch (error) {
+    } catch {
       toast.error('Failed to renew subscription')
     }
   }
@@ -80,7 +88,7 @@ export default function MyLocations() {
       await locationAPI.cancelSubscription(id)
       toast.success('Subscription cancelled')
       fetchLocations()
-    } catch (error) {
+    } catch {
       toast.error('Failed to cancel subscription')
     }
   }
@@ -206,6 +214,7 @@ export default function MyLocations() {
 
   return (
     <Layout>
+      {!online && <OfflineBanner onRetry={fetchLocations} />}
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-12">
         <div className="flex items-center justify-between mb-8">
           <div>
@@ -221,22 +230,23 @@ export default function MyLocations() {
         </div>
 
         {loading ? (
-          <div className="text-center py-12">
-            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-amber-500"></div>
-            <p className="text-stone-400 mt-4">Loading your locations...</p>
-          </div>
+          <SkeletonList rows={4} />
+        ) : error ? (
+          <ErrorState title="Couldn’t load your listings" message={error} onRetry={fetchLocations} />
         ) : locations.length === 0 ? (
-          <div className="text-center py-16">
-            <MapPin className="w-16 h-16 text-stone-600 mx-auto mb-4" />
-            <p className="text-stone-400 text-lg">No listings yet</p>
-            <p className="text-stone-500 mt-2">Create your first location listing to get started</p>
-            <Link
-              to="/list-business"
-              className="inline-block mt-6 px-6 py-3 bg-amber-600 text-amber-50 rounded-lg hover:bg-amber-500 transition"
-            >
-              Add Your First Location
-            </Link>
-          </div>
+          <EmptyState
+            title="No listings yet"
+            message="Create your first location listing to get started."
+            action={
+              <Link
+                to="/list-business"
+                className="inline-block mt-5 px-6 py-3 bg-amber-600 text-amber-50 rounded-lg hover:bg-amber-500 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/40"
+              >
+                Add your first location
+              </Link>
+            }
+            icon={MapPin}
+          />
         ) : (
           <div className="grid gap-6">
             {locations.map(location => (
@@ -247,10 +257,11 @@ export default function MyLocations() {
                 <div className="flex flex-col md:flex-row gap-4 p-6">
                   {/* Image */}
                   {location.imageUrl && (
-                    <img
+                    <SmartImage
                       src={location.imageUrl}
                       alt={location.name}
                       className="w-full md:w-48 h-40 object-cover rounded-lg flex-shrink-0"
+                      optimizeWidth={520}
                     />
                   )}
 
