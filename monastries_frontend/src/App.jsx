@@ -11,7 +11,6 @@ import MapPage from './pages/MapPage'
 import MonasteryDetail from './pages/MonasteryDetail'
 import MonasteryWiki from './pages/MonasteryWiki'
 import Profile from './pages/Profile'
-import Bookings from './pages/Bookings'
 import Contribute from './pages/Contribute'
 import Leaderboard from './pages/Leaderboard'
 import Admin from './pages/Admin'
@@ -39,7 +38,6 @@ export default function App() {
           <Route path="/monastery/:id/wiki" element={<MonasteryWiki />} />
           <Route path="/location/:id" element={<LocationDetail />} />
           <Route path="/profile" element={<Profile />} />
-          <Route path="/bookings" element={<Bookings />} />
           <Route path="/my-contributions" element={<MyContributions />} />
           <Route path="/my-locations" element={<MyLocations />} />
           <Route path="/become-guide" element={<BecomeGuide />} />

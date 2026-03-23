@@ -7,7 +7,7 @@ import {
 } from 'lucide-react'
 import { BackToTop } from './BackToTop'
 
-const HERO_IMAGE = 'https://images.unsplash.com/photo-1548013146-72479768bada?w=1920&q=85'
+const HERO_IMAGE = 'https://www.esikkimtourism.in/wp-content/uploads/2018/10/climate-bnnr.jpg'
 
 export function Layout({ children, noHero }) {
   const { user, logout, isAdmin } = useAuth()
@@ -44,7 +44,6 @@ export function Layout({ children, noHero }) {
                 <Link to="/profile" className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-amber-900/30 text-amber-100 text-sm">
                   <User className="w-4 h-4" /> {user.firstName}
                 </Link>
-                <Link to="/bookings" className="text-sm text-amber-100/90 hover:text-amber-50 hidden sm:inline">Bookings</Link>
                 <Link to="/my-locations" className="text-sm text-amber-100/90 hover:text-amber-50 hidden sm:inline">My Listings</Link>
                 <Link to="/my-guide-profile" className="text-sm text-amber-100/90 hover:text-amber-50 hidden sm:inline">Guide Profile</Link>
                 <Link to="/contribute" className="text-sm text-amber-100/90 hover:text-amber-50 hidden sm:inline">Contribute</Link>

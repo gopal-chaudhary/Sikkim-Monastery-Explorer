@@ -56,12 +56,3 @@ export function validateContribution(data) {
   }
   return errors
 }
-
-export function validateBooking({ visitDate, numberOfPeople }) {
-  const errors = {}
-  if (!visitDate) errors.visitDate = 'Visit date is required'
-  const n = Number(numberOfPeople)
-  if (numberOfPeople == null || numberOfPeople === '' || Number.isNaN(n) || n < 1)
-    errors.numberOfPeople = 'Number of people must be at least 1'
-  return errors
-}

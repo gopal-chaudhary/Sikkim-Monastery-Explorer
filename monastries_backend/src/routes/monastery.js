@@ -5,6 +5,14 @@ const monasterySeedData = require('../data/monasteries');
 
 const REGIONS = ['East Sikkim', 'West Sikkim', 'North Sikkim', 'South Sikkim'];
 
+const COORDINATE_FIXES = {
+    'labrang monastery': { latitude: 27.418881, longitude: 88.581438 },
+    'lachung monastery': { latitude: 27.6006, longitude: 88.7476 },
+    'sang monastery': { latitude: 27.29, longitude: 88.23 },
+    'hee gyathang monastery': { latitude: 27.48, longitude: 88.5 },
+    'chawayng ani monastery': { latitude: 27.534, longitude: 88.512 }
+};
+
 function buildLocationText(location) {
     if (typeof location === 'string') return location;
     if (!location || typeof location !== 'object') return '';
@@ -82,15 +90,36 @@ function normalizeMonastery(item) {
     };
 }
 
+function applyCoordinateFixes(monastery) {
+    const fix = COORDINATE_FIXES[(monastery?.name || '').trim().toLowerCase()];
+    if (!fix) return monastery;
+
+    const hasCoords = Number.isFinite(monastery?.coordinates?.latitude)
+        && Number.isFinite(monastery?.coordinates?.longitude);
+
+    if (hasCoords) return monastery;
+
+    // Return fixed coordinates for known records that were saved without GPS data.
+    return {
+        ...monastery.toObject(),
+        coordinates: {
+            latitude: fix.latitude,
+            longitude: fix.longitude
+        }
+    };
+}
+
 // Get all monasteries (no pagination - max 20)
 monasteryRouter.get('/monasteries/all', async (req, res) => {
     try {
         const monasteries = await Monastery.find({ isActive: true })
             .sort({ rating: -1 });
 
+        const hydratedMonasteries = monasteries.map(applyCoordinateFixes);
+
         res.json({
             success: true,
-            data: monasteries
+            data: hydratedMonasteries
         });
     } catch (err) {
         res.status(400).json({
@@ -157,11 +186,13 @@ monasteryRouter.get('/monasteries', async (req, res) => {
             .skip(skip)
             .limit(limit);
 
+        const hydratedMonasteries = monasteries.map(applyCoordinateFixes);
+
         const total = await Monastery.countDocuments(query);
 
         res.json({
             success: true,
-            data: monasteries,
+            data: hydratedMonasteries,
             pagination: {
                 total,
                 page,
@@ -194,7 +225,7 @@ monasteryRouter.get('/monasteries/:id', async (req, res) => {
 
         res.json({
             success: true,
-            data: monastery
+            data: applyCoordinateFixes(monastery)
         });
     } catch (err) {
         res.status(400).json({
