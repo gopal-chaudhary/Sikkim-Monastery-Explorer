@@ -5,11 +5,15 @@ import { MapPin, Star, ChevronRight } from 'lucide-react'
 import { api, getErrorMessage } from '../api'
 import { Layout } from '../components/Layout'
 import { SkeletonCard } from '../components/SkeletonCard'
+import { SmartImage } from '../components/SmartImage'
+import { EmptyState, ErrorState, OfflineBanner } from '../components/States'
+import { useMonasteries } from '../context/MonasteryContext'
 
 export default function Explore() {
   const [searchParams] = useSearchParams()
   const [monasteries, setMonasteries] = useState([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
   const [search, setSearch] = useState(searchParams.get('search') || '')
   const [debouncedSearch, setDebouncedSearch] = useState(searchParams.get('search') || '')
   const [region, setRegion] = useState(searchParams.get('region') || 'all')
@@ -17,6 +21,7 @@ export default function Explore() {
   const [sortBy, setSortBy] = useState('name')
   const [page, setPage] = useState(1)
   const [pagination, setPagination] = useState(null)
+  const { online } = useMonasteries()
 
   // Debounce search input
   useEffect(() => {
@@ -31,6 +36,7 @@ export default function Explore() {
     let cancelled = false
     async function fetchList() {
       setLoading(true)
+      setError(null)
       try {
         const params = new URLSearchParams({ page, limit: 12, sortBy })
         if (debouncedSearch.trim()) params.set('search', debouncedSearch.trim())
@@ -43,7 +49,9 @@ export default function Explore() {
         }
       } catch (err) {
         if (!cancelled) {
-          toast.error(getErrorMessage(err))
+          const message = getErrorMessage(err)
+          setError(message)
+          toast.error(message)
           setMonasteries([])
         }
       } finally {
@@ -62,6 +70,7 @@ export default function Explore() {
 
   return (
     <Layout>
+      {!online && <OfflineBanner onRetry={() => window.location.reload()} />}
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10 sm:py-14">
         <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8">
           <div>
@@ -106,15 +115,44 @@ export default function Explore() {
               <SkeletonCard key={i} />
             ))}
           </div>
+        ) : error ? (
+          <ErrorState
+            title="Couldn’t load monasteries"
+            message={error}
+            onRetry={() => window.location.reload()}
+          />
         ) : monasteries.length === 0 ? (
-          <div className="text-center py-16 text-stone-400">No monasteries found. Try changing filters or seed data via API.</div>
+          <EmptyState
+            title="No monasteries match your search"
+            message="Try clearing filters, changing region, or searching a different name."
+            action={
+              <button
+                type="button"
+                onClick={() => {
+                  setSearch('')
+                  setRegion('all')
+                  setAge('')
+                  setSortBy('name')
+                  setPage(1)
+                }}
+                className="mt-5 px-4 py-2 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-100 hover:bg-amber-500/20 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/40"
+              >
+                Clear filters
+              </button>
+            }
+          />
         ) : (
           <>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
               {monasteries.map((m) => (
                 <Link key={m._id} to={`/monastery/${m._id}`} className="card-shine group rounded-2xl overflow-hidden bg-stone-900/60 border border-amber-900/30 hover:border-amber-700/50 transition-all duration-300 block">
                   <div className="relative aspect-[4/3] overflow-hidden">
-                    <img src={m.imageUrl || 'https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?w=600'} alt={m.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                    <SmartImage
+                      src={m.imageUrl || 'https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?w=600'}
+                      alt={m.name}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      optimizeWidth={800}
+                    />
                     <div className="absolute inset-0 bg-gradient-to-t from-stone-950 via-stone-950/20 to-transparent" />
                     <div className="absolute top-3 right-3 flex items-center gap-1 px-2 py-1 rounded-full bg-stone-900/80 text-amber-400 text-xs font-medium">
                       <Star className="w-3.5 h-3.5 fill-amber-400" /> {m.rating ?? '—'}

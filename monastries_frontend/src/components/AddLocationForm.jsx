@@ -16,7 +16,6 @@ export default function AddLocationForm({ onSuccess, onClose }) {
   })
   const [latitude, setLatitude] = useState('')
   const [longitude, setLongitude] = useState('')
-  const [imageFile, setImageFile] = useState(null)
   const [imagePreview, setImagePreview] = useState(null)
   const [acceptTerms, setAcceptTerms] = useState(false)
   const [showTermsModal, setShowTermsModal] = useState(false)
@@ -47,7 +46,6 @@ export default function AddLocationForm({ onSuccess, onClose }) {
         return
       }
 
-      setImageFile(file)
       const reader = new FileReader()
       reader.onloadend = () => {
         setImagePreview(reader.result)

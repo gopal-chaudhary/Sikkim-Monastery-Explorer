@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 :root {
-  --font-heading: "Cormorant Garamond", Georgia, serif;
-  --font-body: "Outfit", system-ui, sans-serif;
+  --font-heading: "Poppins", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, "Noto Sans", "Liberation Sans", sans-serif;
+  --font-body: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, "Noto Sans", "Liberation Sans", sans-serif;
   --saffron: #f59e0b;
   --saffron-light: #fbbf24;
   --maroon: #7f1d1d;
@@ -10,13 +10,28 @@
   --gold: #d97706;
   --cream: #fef3c7;
   --ink: #0c0a09;
+  --bg: #0c0a09;
+  --text: #fafaf9;
+  --glass-bg: rgba(23, 18, 16, 0.75);
+  --glass-border: rgba(251, 191, 36, 0.12);
+}
+
+[data-theme="light"] {
+  --bg: #fff7ed;
+  --text: #0c0a09;
+  --glass-bg: rgba(255, 255, 255, 0.75);
+  --glass-border: rgba(120, 53, 15, 0.14);
 }
 
 body {
   font-family: var(--font-body);
-  background-color: var(--ink);
-  color: #fafaf9;
+  background-color: var(--bg);
+  color: var(--text);
   overflow-x: hidden;
+}
+
+:focus-visible {
+  outline: none;
 }
 
 .font-heading {
@@ -96,10 +111,10 @@ body {
 
 /* Glass card */
 .glass {
-  background: rgba(23, 18, 16, 0.75);
+  background: var(--glass-bg);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(251, 191, 36, 0.12);
+  border: 1px solid var(--glass-border);
 }
 
 /* ----- Marquee / running cards (infinite scroll) ----- */

@@ -83,10 +83,7 @@ const monasteries = [
       state: "Sikkim",
       country: "India"
     },
-    coordinates: {
-      latitude: 27.29,
-      longitude: 88.23
-    },
+    coordinates: null,
     established: 1912,
     foundedBy: null,
     sect: "Kagyupa (Vajrayana Buddhism)",
@@ -201,10 +198,7 @@ const monasteries = [
       state: "Sikkim",
       country: "India"
     },
-    coordinates: {
-      latitude: 27.48,
-      longitude: 88.5
-    },
+    coordinates: null,
     established: 1914,
     foundedBy: "Abi Putso Rangdrol",
     sect: "Buddhist",
@@ -229,10 +223,7 @@ const monasteries = [
       state: "Sikkim",
       country: "India"
     },
-    coordinates: {
-      latitude: 27.418881,
-      longitude: 88.581438
-    },
+    coordinates: null,
     established: 1844,
     foundedBy: "Gyalshe Rigzing Chempa",
     sect: "Nyingmapa (Tibetan Buddhism)",
@@ -291,10 +282,7 @@ const monasteries = [
       state: "Sikkim",
       country: "India"
     },
-    coordinates: {
-      latitude: 27.6006,
-      longitude: 88.7476
-    },
+    coordinates: null,
     established: 1880,
     foundedBy: null,
     sect: "Nyingma (Tibetan Buddhism)",
@@ -448,10 +436,7 @@ const monasteries = [
       state: "Sikkim",
       country: "India"
     },
-    coordinates: {
-      latitude: 27.534,
-      longitude: 88.512
-    },
+    coordinates: null,
     established: null,
     foundedBy: "Chogyal Tsugphud Namgyal",
     sect: "Tibetan Buddhism",
