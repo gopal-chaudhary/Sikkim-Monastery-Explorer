@@ -1,14 +1,14 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { toast } from 'react-toastify'
-import { MapPin, Star, Calendar, Hotel, Compass, BookOpen, Users, Church, Sparkles, Mountain, Clock, AlertTriangle, UserCircle, Phone, Mail, DollarSign, Award, Briefcase, Languages } from 'lucide-react'
+import { MapPin, Star, Hotel, Compass, BookOpen, Users, Church, Sparkles, Mountain, Clock, AlertTriangle, UserCircle, Phone, Mail, DollarSign, Award, Briefcase, Languages } from 'lucide-react'
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import { api, getErrorMessage, locationAPI, guideAPI } from '../api'
 import { useAuth } from '../context/AuthContext'
-import { validateBooking } from '../utils/validation'
 import { Layout } from '../components/Layout'
+import ReviewSection from '../components/ReviewSection'
 import { SkeletonDetail } from '../components/SkeletonCard'
 
 const TYPE_META = {
@@ -36,9 +36,6 @@ export default function MonasteryDetail() {
   const [guides, setGuides] = useState([])
   const [loading, setLoading] = useState(true)
   const [guideLoading, setGuideLoading] = useState(false)
-  const [bookingForm, setBookingForm] = useState({ visitDate: '', numberOfPeople: 1, contactNumber: '' })
-  const [bookingErrors, setBookingErrors] = useState({})
-  const [bookingSubmitting, setBookingSubmitting] = useState(false)
 
   useEffect(() => {
     let cancelled = false
@@ -95,34 +92,6 @@ export default function MonasteryDetail() {
     fetchGuides()
     return () => { cancelled = true }
   }, [id])
-
-  const handleBookingSubmit = async (e) => {
-    e.preventDefault()
-    const errs = validateBooking(bookingForm)
-    setBookingErrors(errs)
-    if (Object.keys(errs).length) return
-    if (!user) {
-      toast.info('Please log in to book.')
-      navigate('/login')
-      return
-    }
-    setBookingSubmitting(true)
-    try {
-      const { data } = await api.post('/booking/create', {
-        monasteryId: monastery._id,
-        monasteryName: monastery.name,
-        visitDate: bookingForm.visitDate,
-        numberOfPeople: Number(bookingForm.numberOfPeople),
-        contactNumber: bookingForm.contactNumber || undefined,
-      })
-      toast.success(data.message || 'Booked successfully!')
-      setBookingForm({ visitDate: '', numberOfPeople: 1, contactNumber: '' })
-    } catch (err) {
-      toast.error(getErrorMessage(err))
-    } finally {
-      setBookingSubmitting(false)
-    }
-  }
 
   if (loading || !monastery) {
     return (
@@ -512,6 +481,11 @@ export default function MonasteryDetail() {
           {!travelGuide && !guideLoading && <p className="text-stone-500 text-sm">Travel guide not available for this monastery.</p>}
         </section>
 
+        {/* Reviews Section */}
+        <div className="mb-8">
+          <ReviewSection monasteryId={id} />
+        </div>
+
         {/* Tourist Guides Section */}
         {guides && guides.length > 0 && (
           <section className="mb-8">
@@ -604,34 +578,6 @@ export default function MonasteryDetail() {
             </div>
           </section>
         )}
-
-        {/* Book visit */}
-        <section>
-          <h2 className="font-heading text-xl font-bold text-amber-50 mb-4 flex items-center gap-2"><Calendar className="w-5 h-5" /> Book a visit</h2>
-          {user ? (
-            <form onSubmit={handleBookingSubmit} className="glass rounded-2xl p-6 max-w-md space-y-4">
-              <div>
-                <label className="block text-sm text-amber-200/90 mb-1">Visit date</label>
-                <input type="date" value={bookingForm.visitDate} onChange={(e) => setBookingForm((f) => ({ ...f, visitDate: e.target.value }))} className="w-full px-4 py-2.5 rounded-xl bg-stone-900/80 border border-amber-900/50 text-stone-100 focus:outline-none focus:ring-2 focus:ring-amber-500/50" />
-                {bookingErrors.visitDate && <p className="text-xs text-rose-400 mt-1">{bookingErrors.visitDate}</p>}
-              </div>
-              <div>
-                <label className="block text-sm text-amber-200/90 mb-1">Number of people</label>
-                <input type="number" min={1} value={bookingForm.numberOfPeople} onChange={(e) => setBookingForm((f) => ({ ...f, numberOfPeople: e.target.value }))} className="w-full px-4 py-2.5 rounded-xl bg-stone-900/80 border border-amber-900/50 text-stone-100 focus:outline-none focus:ring-2 focus:ring-amber-500/50" />
-                {bookingErrors.numberOfPeople && <p className="text-xs text-rose-400 mt-1">{bookingErrors.numberOfPeople}</p>}
-              </div>
-              <div>
-                <label className="block text-sm text-amber-200/90 mb-1">Contact number (optional)</label>
-                <input type="tel" value={bookingForm.contactNumber} onChange={(e) => setBookingForm((f) => ({ ...f, contactNumber: e.target.value }))} className="w-full px-4 py-2.5 rounded-xl bg-stone-900/80 border border-amber-900/50 text-stone-100 focus:outline-none focus:ring-2 focus:ring-amber-500/50" />
-              </div>
-              <button type="submit" disabled={bookingSubmitting} className="w-full py-3 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-stone-900 font-semibold hover:brightness-110 transition disabled:opacity-60">
-                {bookingSubmitting ? 'Booking...' : 'Confirm booking'}
-              </button>
-            </form>
-          ) : (
-            <p className="text-stone-400">Please <Link to="/login" className="text-amber-400 hover:underline">log in</Link> to book a visit.</p>
-          )}
-        </section>
       </div>
     </Layout>
   )

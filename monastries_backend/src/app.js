@@ -38,23 +38,23 @@ const authRouter = require("./routes/auth");
 const profileRouter = require("./routes/profile");
 const requestRouter = require("./routes/request");
 const userRouter = require("./routes/user");
-const bookingRouter = require("./routes/booking");
 const monasteryRouter = require("./routes/monastery");
 const travelGuideRouter = require("./routes/travelGuide");
 const contributionRouter = require("./routes/contribution");
 const locationRouter = require("./routes/location");
 const guideRouter = require("./routes/guide");
+const reviewRouter = require("./routes/review");
 
 app.use("/",authRouter);
 app.use("/",profileRouter);
 app.use("/",requestRouter);
 app.use("/",userRouter);
-app.use("/",bookingRouter);
 app.use("/",monasteryRouter);
 app.use("/",travelGuideRouter);
 app.use("/",contributionRouter);
 app.use("/",locationRouter);
 app.use("/",guideRouter);
+app.use("/",reviewRouter);
 
 connectDB()
     .then(()=>{
