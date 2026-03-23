@@ -705,6 +705,87 @@ const monasteries = [
     nearbyAttractions: ['Singtam', 'Gangtok'],
     region: "South Sikkim"
   }
+  ,
+  {
+    name: "Rumtek Monastery",
+    link: "https://en.wikipedia.org/wiki/Rumtek_Monastery",
+    dataAvailable: true,
+    location: {
+      nearTown: "Rumtek",
+      district: "East Sikkim",
+      state: "Sikkim",
+      country: "India"
+    },
+    coordinates: {
+      latitude: 27.3325,
+      longitude: 88.5669
+    },
+    established: 1966,
+    foundedBy: "16th Karmapa Rangjung Rigpe Dorje (seat re-established)",
+    sect: "Karma Kagyu (Kagyupa, Tibetan Buddhism)",
+    description: "Rumtek Monastery is the seat-in-exile of the Gyalwang Karmapa and one of the largest and most important centers of the Karma Kagyu lineage in Sikkim. The contemporary Rumtek complex was rebuilt in the 20th century and serves as a major pilgrimage, cultural and teaching centre.",
+    imageUrl: "https://images.unsplash.com/photo-1558981403-c2f6b5f0d9a1?w=800",
+    features: ["Seat of the Karmapa", "Extensive prayer halls", "Monastic school and library", "Annual Cham festivals"],
+    rating: 4.7,
+    visitors: 45000,
+    openingHours: '7:00 AM - 6:00 PM',
+    entryFee: 'Free',
+    bestTimeToVisit: 'March to June, October to December',
+    nearbyAttractions: ['Gangtok', 'Enchey Monastery'],
+    region: "East Sikkim"
+  },
+
+  {
+    name: "Dubdi Monastery",
+    link: "https://en.wikipedia.org/wiki/Dubdi_Monastery",
+    dataAvailable: true,
+    location: {
+      village: "Yuksom",
+      district: "Gyalshing district",
+      state: "Sikkim",
+      country: "India"
+    },
+    coordinates: null,
+    established: 1701,
+    foundedBy: "Lhatsün Namkha Jikmé",
+    sect: "Nyingma (Tibetan Buddhism)",
+    description: "Dubdi Monastery (also called Yuksom Monastery) is one of the oldest monasteries in Sikkim and marks the beginning of the traditional pilgrimage circuit. It was founded in the early 18th century and retains a quiet, historical character.",
+    imageUrl: "https://images.unsplash.com/photo-1604329760661-e71dc83f8f26?w=800",
+    features: ["Historic monastery", "Part of Yuksom pilgrimage circuit", "Ancient statues and murals"],
+    rating: 4.5,
+    visitors: 9000,
+    openingHours: '6:00 AM - 5:00 PM',
+    entryFee: 'Free',
+    bestTimeToVisit: 'March to June, September to November',
+    nearbyAttractions: ['Norbugang Chorten', 'Khecheopalri Lake'],
+    region: "West Sikkim"
+  },
+
+  {
+    name: "Ralong Monastery",
+    link: "https://en.wikipedia.org/wiki/Ralong_Monastery",
+    dataAvailable: true,
+    location: {
+      village: "Ralong",
+      district: "Namchi area",
+      state: "Sikkim",
+      country: "India"
+    },
+    coordinates: null,
+    established: 1970,
+    foundedBy: "Local monastic community",
+    sect: "Karma Kagyu (Tibetan Buddhism)",
+    description: "Ralong Monastery is a regional monastery known for its scenic hilltop setting and community-oriented activities. It hosts regular prayers, teachings and local religious festivals.",
+    imageUrl: "https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?w=800",
+    features: ["Hilltop monastery", "Local festivals and teachings", "Scenic viewpoints"],
+    rating: 4.2,
+    visitors: 7000,
+    openingHours: '7:00 AM - 5:00 PM',
+    entryFee: 'Free',
+    bestTimeToVisit: 'March to June, October to December',
+    nearbyAttractions: ['Ravangla', 'Tashiding Monastery'],
+    region: "South Sikkim"
+  }
 ];
 
 module.exports = monasteries;
