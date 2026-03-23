@@ -1,15 +1,16 @@
 import { useState, useEffect } from 'react'
-import { useParams, useNavigate, Link } from 'react-router-dom'
+import { useParams, Link } from 'react-router-dom'
 import { toast } from 'react-toastify'
-import { MapPin, Star, Calendar, Hotel, Compass, BookOpen, Users, Church, Sparkles, Mountain, Clock, AlertTriangle, UserCircle, Phone, Mail, DollarSign, Award, Briefcase, Languages } from 'lucide-react'
+import { MapPin, Star, Hotel, Compass, BookOpen, Users, Church, Sparkles, Mountain, Clock, AlertTriangle, UserCircle, Phone, Mail, DollarSign, Award, Briefcase, Languages } from 'lucide-react'
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import { api, getErrorMessage, locationAPI, guideAPI } from '../api'
-import { useAuth } from '../context/AuthContext'
-import { validateBooking } from '../utils/validation'
 import { Layout } from '../components/Layout'
+import ReviewSection from '../components/ReviewSection'
 import { SkeletonDetail } from '../components/SkeletonCard'
+import { SmartImage } from '../components/SmartImage'
+import { ErrorState, OfflineBanner } from '../components/States'
 
 const TYPE_META = {
   Hotel: { symbol: '🏨', color: '#3b82f6', label: 'Hotel' },
@@ -28,26 +29,28 @@ function getTypeMeta(type) {
 
 export default function MonasteryDetail() {
   const { id } = useParams()
-  const navigate = useNavigate()
-  const { user } = useAuth()
   const [monastery, setMonastery] = useState(null)
   const [travelGuide, setTravelGuide] = useState(null)
   const [userLocations, setUserLocations] = useState([])
   const [guides, setGuides] = useState([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
   const [guideLoading, setGuideLoading] = useState(false)
-  const [bookingForm, setBookingForm] = useState({ visitDate: '', numberOfPeople: 1, contactNumber: '' })
-  const [bookingErrors, setBookingErrors] = useState({})
-  const [bookingSubmitting, setBookingSubmitting] = useState(false)
+  const online = typeof navigator !== 'undefined' ? navigator.onLine : true
 
   useEffect(() => {
     let cancelled = false
     async function fetchMonastery() {
       try {
+        setError(null)
         const { data } = await api.get(`/monasteries/${id}`)
         if (!cancelled) setMonastery(data.data)
       } catch (err) {
-        if (!cancelled) toast.error(getErrorMessage(err))
+        if (!cancelled) {
+          const message = getErrorMessage(err)
+          setError(message)
+          toast.error(message)
+        }
       } finally {
         if (!cancelled) setLoading(false)
       }
@@ -96,37 +99,10 @@ export default function MonasteryDetail() {
     return () => { cancelled = true }
   }, [id])
 
-  const handleBookingSubmit = async (e) => {
-    e.preventDefault()
-    const errs = validateBooking(bookingForm)
-    setBookingErrors(errs)
-    if (Object.keys(errs).length) return
-    if (!user) {
-      toast.info('Please log in to book.')
-      navigate('/login')
-      return
-    }
-    setBookingSubmitting(true)
-    try {
-      const { data } = await api.post('/booking/create', {
-        monasteryId: monastery._id,
-        monasteryName: monastery.name,
-        visitDate: bookingForm.visitDate,
-        numberOfPeople: Number(bookingForm.numberOfPeople),
-        contactNumber: bookingForm.contactNumber || undefined,
-      })
-      toast.success(data.message || 'Booked successfully!')
-      setBookingForm({ visitDate: '', numberOfPeople: 1, contactNumber: '' })
-    } catch (err) {
-      toast.error(getErrorMessage(err))
-    } finally {
-      setBookingSubmitting(false)
-    }
-  }
-
-  if (loading || !monastery) {
+  if (loading) {
     return (
       <Layout>
+        {!online && <OfflineBanner onRetry={() => window.location.reload()} />}
         <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
           <SkeletonDetail />
         </div>
@@ -134,12 +110,69 @@ export default function MonasteryDetail() {
     )
   }
 
+  if (!monastery) {
+    return (
+      <Layout>
+        {!online && <OfflineBanner onRetry={() => window.location.reload()} />}
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
+          <ErrorState
+            title="Monastery not found"
+            message={error || 'This monastery may have been removed or the link is incorrect.'}
+            onRetry={() => window.location.reload()}
+          />
+        </div>
+      </Layout>
+    )
+  }
+
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'TouristAttraction',
+    name: monastery.name,
+    description: monastery.description,
+    image: monastery.imageUrl,
+    address: {
+      '@type': 'PostalAddress',
+      addressLocality: monastery.location?.district || monastery.location?.village || '',
+      addressRegion: monastery.location?.state || monastery.region || 'Sikkim',
+      addressCountry: 'IN',
+    },
+    geo: monastery.coordinates?.latitude && monastery.coordinates?.longitude
+      ? {
+          '@type': 'GeoCoordinates',
+          latitude: monastery.coordinates.latitude,
+          longitude: monastery.coordinates.longitude,
+        }
+      : undefined,
+    sameAs: monastery.link || undefined,
+    aggregateRating: monastery.rating
+      ? {
+          '@type': 'AggregateRating',
+          ratingValue: monastery.rating,
+          bestRating: 5,
+          ratingCount: monastery.reviewCount || 1,
+        }
+      : undefined,
+  }
+
   return (
     <Layout>
+      {!online && <OfflineBanner onRetry={() => window.location.reload()} />}
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
         <div className="rounded-2xl overflow-hidden bg-stone-900/60 border border-amber-900/30 mb-8">
           <div className="relative aspect-[21/9] sm:aspect-[3/1]">
-            <img src={monastery.imageUrl || 'https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?w=1200'} alt={monastery.name} className="w-full h-full object-cover" />
+            <SmartImage
+              src={monastery.imageUrl || 'https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?w=1200'}
+              alt={monastery.name}
+              className="w-full h-full object-cover"
+              loading="eager"
+              fetchpriority="high"
+              optimizeWidth={1400}
+            />
             <div className="absolute inset-0 bg-gradient-to-t from-stone-950 via-transparent to-transparent" />
             <div className="absolute bottom-4 left-4 right-4 flex items-center gap-2">
               <span className="px-2 py-0.5 rounded bg-amber-500/90 text-stone-900 text-xs font-semibold">{monastery.region}</span>
@@ -448,10 +481,11 @@ export default function MonasteryDetail() {
                       <Popup>
                         <div className="text-sm max-w-xs">
                           {location.imageUrl && (
-                            <img 
-                              src={location.imageUrl} 
-                              alt={location.name} 
+                            <SmartImage
+                              src={location.imageUrl}
+                              alt={location.name}
                               className="w-full h-24 object-cover rounded mb-2"
+                              optimizeWidth={500}
                             />
                           )}
                           <p className="font-semibold text-sm">{location.name}</p>
@@ -512,6 +546,11 @@ export default function MonasteryDetail() {
           {!travelGuide && !guideLoading && <p className="text-stone-500 text-sm">Travel guide not available for this monastery.</p>}
         </section>
 
+        {/* Reviews Section */}
+        <div className="mb-8">
+          <ReviewSection monasteryId={id} />
+        </div>
+
         {/* Tourist Guides Section */}
         {guides && guides.length > 0 && (
           <section className="mb-8">
@@ -526,10 +565,11 @@ export default function MonasteryDetail() {
                 <div key={guide._id} className="glass rounded-2xl p-5 border border-amber-900/30 hover:border-amber-700/50 transition">
                   <div className="flex items-start gap-4">
                     {guide.profilePhoto ? (
-                      <img
+                      <SmartImage
                         src={guide.profilePhoto}
                         alt={guide.guideName}
                         className="w-16 h-16 rounded-full object-cover border-2 border-amber-500"
+                        optimizeWidth={160}
                       />
                     ) : (
                       <div className="w-16 h-16 rounded-full bg-amber-900/50 flex items-center justify-center border-2 border-amber-500">
@@ -604,34 +644,6 @@ export default function MonasteryDetail() {
             </div>
           </section>
         )}
-
-        {/* Book visit */}
-        <section>
-          <h2 className="font-heading text-xl font-bold text-amber-50 mb-4 flex items-center gap-2"><Calendar className="w-5 h-5" /> Book a visit</h2>
-          {user ? (
-            <form onSubmit={handleBookingSubmit} className="glass rounded-2xl p-6 max-w-md space-y-4">
-              <div>
-                <label className="block text-sm text-amber-200/90 mb-1">Visit date</label>
-                <input type="date" value={bookingForm.visitDate} onChange={(e) => setBookingForm((f) => ({ ...f, visitDate: e.target.value }))} className="w-full px-4 py-2.5 rounded-xl bg-stone-900/80 border border-amber-900/50 text-stone-100 focus:outline-none focus:ring-2 focus:ring-amber-500/50" />
-                {bookingErrors.visitDate && <p className="text-xs text-rose-400 mt-1">{bookingErrors.visitDate}</p>}
-              </div>
-              <div>
-                <label className="block text-sm text-amber-200/90 mb-1">Number of people</label>
-                <input type="number" min={1} value={bookingForm.numberOfPeople} onChange={(e) => setBookingForm((f) => ({ ...f, numberOfPeople: e.target.value }))} className="w-full px-4 py-2.5 rounded-xl bg-stone-900/80 border border-amber-900/50 text-stone-100 focus:outline-none focus:ring-2 focus:ring-amber-500/50" />
-                {bookingErrors.numberOfPeople && <p className="text-xs text-rose-400 mt-1">{bookingErrors.numberOfPeople}</p>}
-              </div>
-              <div>
-                <label className="block text-sm text-amber-200/90 mb-1">Contact number (optional)</label>
-                <input type="tel" value={bookingForm.contactNumber} onChange={(e) => setBookingForm((f) => ({ ...f, contactNumber: e.target.value }))} className="w-full px-4 py-2.5 rounded-xl bg-stone-900/80 border border-amber-900/50 text-stone-100 focus:outline-none focus:ring-2 focus:ring-amber-500/50" />
-              </div>
-              <button type="submit" disabled={bookingSubmitting} className="w-full py-3 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-stone-900 font-semibold hover:brightness-110 transition disabled:opacity-60">
-                {bookingSubmitting ? 'Booking...' : 'Confirm booking'}
-              </button>
-            </form>
-          ) : (
-            <p className="text-stone-400">Please <Link to="/login" className="text-amber-400 hover:underline">log in</Link> to book a visit.</p>
-          )}
-        </section>
       </div>
     </Layout>
   )

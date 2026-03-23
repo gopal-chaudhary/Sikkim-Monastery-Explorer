@@ -6,12 +6,16 @@ import {
   Shield,
 } from 'lucide-react'
 import { BackToTop } from './BackToTop'
+import { SmartImage } from './SmartImage'
+import { CommandPalette } from './CommandPalette'
+import { useTheme } from '../context/ThemeContext'
 
-const HERO_IMAGE = 'https://images.unsplash.com/photo-1548013146-72479768bada?w=1920&q=85'
+const HERO_IMAGE = 'https://www.esikkimtourism.in/wp-content/uploads/2018/10/climate-bnnr.jpg'
 
 export function Layout({ children, noHero }) {
   const { user, logout, isAdmin } = useAuth()
   const navigate = useNavigate()
+  const { theme, toggle } = useTheme()
 
   const handleLogout = async () => {
     await logout()
@@ -19,7 +23,8 @@ export function Layout({ children, noHero }) {
   }
 
   return (
-    <div className="min-h-screen bg-[#0c0a09] text-stone-100">
+    <div className="min-h-screen bg-[var(--bg)] text-[var(--text)]">
+      <CommandPalette isAdmin={isAdmin} />
       <nav className="sticky top-0 z-50 glass border-b border-amber-900/30">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 flex items-center justify-between h-14 sm:h-16">
           <Link to="/" className="flex items-center gap-3">
@@ -34,6 +39,25 @@ export function Layout({ children, noHero }) {
           <div className="flex items-center gap-2 sm:gap-4">
             <Link to="/explore" className="text-sm text-amber-100/90 hover:text-amber-50 transition hidden sm:inline">Explore</Link>
             <Link to="/map" className="text-sm text-amber-100/90 hover:text-amber-50 transition">Map</Link>
+            <button
+              type="button"
+              onClick={toggle}
+              className="hidden sm:inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-stone-950/50 border border-amber-900/40 text-stone-300 hover:text-amber-100 hover:border-amber-700/50 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/40"
+              aria-label="Toggle light/dark mode"
+            >
+              <span className="text-xs">{theme === 'dark' ? 'Dark' : 'Light'}</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                window.dispatchEvent(new Event('cmdk:open'))
+              }}
+              className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-stone-950/50 border border-amber-900/40 text-stone-300 hover:text-amber-100 hover:border-amber-700/50 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/40"
+              aria-label="Open search (Command+K)"
+            >
+              <span className="text-xs">Search</span>
+              <kbd className="text-[10px] text-stone-400 border border-stone-700/60 rounded px-1.5 py-0.5">⌘ K</kbd>
+            </button>
             {isAdmin && (
               <Link to="/admin" className="flex items-center gap-1 text-sm text-amber-400 hover:text-amber-300">
                 <Shield className="w-4 h-4" /> Admin
@@ -44,7 +68,6 @@ export function Layout({ children, noHero }) {
                 <Link to="/profile" className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-amber-900/30 text-amber-100 text-sm">
                   <User className="w-4 h-4" /> {user.firstName}
                 </Link>
-                <Link to="/bookings" className="text-sm text-amber-100/90 hover:text-amber-50 hidden sm:inline">Bookings</Link>
                 <Link to="/my-locations" className="text-sm text-amber-100/90 hover:text-amber-50 hidden sm:inline">My Listings</Link>
                 <Link to="/my-guide-profile" className="text-sm text-amber-100/90 hover:text-amber-50 hidden sm:inline">Guide Profile</Link>
                 <Link to="/contribute" className="text-sm text-amber-100/90 hover:text-amber-50 hidden sm:inline">Contribute</Link>
@@ -63,12 +86,16 @@ export function Layout({ children, noHero }) {
       </nav>
         <BackToTop />
         {!noHero && (
-        <header
-          className="relative h-[42vh] min-h-[280px] flex flex-col justify-end pb-8 px-4 sm:px-6"
-          style={{
-            background: `linear-gradient(180deg, transparent 0%, rgba(12,10,9,0.85) 100%), url(${HERO_IMAGE}) center/cover no-repeat`,
-          }}
-        >
+        <header className="relative h-[42vh] min-h-[280px] flex flex-col justify-end pb-8 px-4 sm:px-6 overflow-hidden">
+          <SmartImage
+            src={HERO_IMAGE}
+            alt="Sikkim mountains"
+            className="absolute inset-0 w-full h-full object-cover"
+            loading="eager"
+            decoding="async"
+            fetchpriority="high"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-stone-950/40 to-stone-950" />
           <div className="max-w-6xl mx-auto w-full">
             <p className="text-amber-400/90 text-xs sm:text-sm tracking-widest uppercase">Buddhist Heritage of the Himalayas</p>
             <h1 className="font-heading text-3xl sm:text-4xl md:text-5xl font-bold text-amber-50 mt-1">

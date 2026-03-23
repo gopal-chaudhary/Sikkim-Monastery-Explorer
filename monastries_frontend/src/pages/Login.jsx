@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import { useAuth } from '../context/AuthContext'
-import { api, getErrorMessage } from '../api'
+import { getErrorMessage } from '../api'
 import { validateLogin } from '../utils/validation'
 import { Layout } from '../components/Layout'
 
@@ -40,7 +40,7 @@ export default function Login() {
       <div className="max-w-md mx-auto px-4 py-12 sm:py-16">
         <div className="glass rounded-2xl p-6 sm:p-8 shadow-xl border border-amber-900/40">
           <h2 className="font-heading text-2xl sm:text-3xl font-bold text-amber-50 mb-2">Login</h2>
-          <p className="text-stone-400 text-sm mb-6">Sign in to access your profile, bookings and contributions.</p>
+          <p className="text-stone-400 text-sm mb-6">Sign in to access your profile and contributions.</p>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-amber-200/90 mb-1">Email</label>

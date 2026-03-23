@@ -122,3 +122,19 @@ export const guideAPI = {
     api.get('/guide/all'),
 }
 
+// ===== Review APIs =====
+
+export const reviewAPI = {
+  // Get all reviews for a monastery
+  getReviews: (monasteryId) =>
+    api.get(`/monasteries/${monasteryId}/reviews`),
+
+  // Add or update own review
+  submitReview: (monasteryId, data) =>
+    api.post(`/monasteries/${monasteryId}/reviews`, data),
+
+  // Delete own review
+  deleteReview: (monasteryId) =>
+    api.delete(`/monasteries/${monasteryId}/reviews`),
+}
+

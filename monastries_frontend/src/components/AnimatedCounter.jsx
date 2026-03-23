@@ -22,10 +22,7 @@ export function AnimatedCounter({ end, suffix = '', duration = 1500, className =
 
   useEffect(() => {
     if (!started) return
-    if (isInfinity) {
-      setCount('∞')
-      return
-    }
+    if (isInfinity) return
     const numEnd = typeof end === 'string' ? parseInt(end, 10) : end
     if (Number.isNaN(numEnd)) return
     const startTime = performance.now()
@@ -41,7 +38,7 @@ export function AnimatedCounter({ end, suffix = '', duration = 1500, className =
 
   return (
     <span ref={ref} className={className}>
-      {count !== null ? `${count}${isInfinity ? '' : suffix}` : '0'}
+      {started && isInfinity ? `∞${suffix}` : (count !== null ? `${count}${suffix}` : '0')}
     </span>
   )
 }

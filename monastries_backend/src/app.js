@@ -3,6 +3,7 @@ const connectDB = require("./config/database");
 const app = express();
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
+const compression = require("compression");
 require('dotenv').config();
 
 // CORS configuration for frontend
@@ -29,32 +30,44 @@ app.use(cors(corsOptions));
 // Explicitly respond to preflight requests for all routes
 app.options(/.*/, cors(corsOptions));
 
+app.disable('x-powered-by');
+app.set('etag', 'weak');
+app.use(compression());
+
 // Increase payload limits for base64 image uploads from frontend forms
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
 app.use(cookieParser());
 
+app.get('/health', (req, res) => {
+  res.status(200).json({
+    ok: true,
+    uptime: process.uptime(),
+    timestamp: new Date().toISOString(),
+  });
+});
+
 const authRouter = require("./routes/auth");
 const profileRouter = require("./routes/profile");
 const requestRouter = require("./routes/request");
 const userRouter = require("./routes/user");
-const bookingRouter = require("./routes/booking");
 const monasteryRouter = require("./routes/monastery");
 const travelGuideRouter = require("./routes/travelGuide");
 const contributionRouter = require("./routes/contribution");
 const locationRouter = require("./routes/location");
 const guideRouter = require("./routes/guide");
+const reviewRouter = require("./routes/review");
 
 app.use("/",authRouter);
 app.use("/",profileRouter);
 app.use("/",requestRouter);
 app.use("/",userRouter);
-app.use("/",bookingRouter);
 app.use("/",monasteryRouter);
 app.use("/",travelGuideRouter);
 app.use("/",contributionRouter);
 app.use("/",locationRouter);
 app.use("/",guideRouter);
+app.use("/",reviewRouter);
 
 connectDB()
     .then(()=>{

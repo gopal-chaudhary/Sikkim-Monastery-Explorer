@@ -8,10 +8,9 @@ import { ProtectedRoute } from '../components/ProtectedRoute'
 import { User, Award } from 'lucide-react'
 
 export default function Profile() {
-  const { user, updateProfile, fetchUser } = useAuth()
+  const { user, updateProfile } = useAuth()
   const [form, setForm] = useState({ firstName: '', lastName: '', emailId: '', age: '', gender: '', about: '', photoUrl: '' })
   const [loading, setLoading] = useState(false)
-  const [errors, setErrors] = useState({})
 
   useEffect(() => {
     if (user) {

@@ -11,6 +11,7 @@ import { Layout } from '../components/Layout'
 import { Marquee } from '../components/Marquee'
 import { ScrollReveal } from '../components/ScrollReveal'
 import { AnimatedCounter } from '../components/AnimatedCounter'
+import { SmartImage } from '../components/SmartImage'
 import { useMonasteries } from '../context/MonasteryContext'
 import { HERO_IMAGE, QUOTE_IMAGE, EXPERIENCE } from '../constants'
 
@@ -36,10 +37,16 @@ export default function Home() {
     <>
       <header
         className="relative min-h-[85vh] flex flex-col justify-between overflow-hidden"
-        style={{
-          background: `linear-gradient(180deg, rgba(12,10,9,0.4) 0%, rgba(12,10,9,0.75) 50%, rgba(12,10,9,0.98) 100%), url(${HERO_IMAGE}) center/cover no-repeat`,
-        }}
       >
+        <SmartImage
+          src={HERO_IMAGE}
+          alt="Sikkim monastery landscape"
+          className="absolute inset-0 w-full h-full object-cover"
+          loading="eager"
+          fetchpriority="high"
+          optimizeWidth={1800}
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-stone-950/40 via-stone-950/75 to-stone-950" />
         <div className="gradient-orb gradient-orb-1" aria-hidden />
         <div className="gradient-orb gradient-orb-2" aria-hidden />
         <div className="flex-1 flex flex-col justify-center px-4 sm:px-6 lg:px-8 pb-20 sm:pb-28 z-10 relative">
@@ -113,7 +120,12 @@ export default function Home() {
               <ScrollReveal key={m._id} delay={i * 0.08}>
                 <Link to={`/monastery/${m._id}`} className="card-shine group rounded-2xl overflow-hidden bg-stone-900/60 border border-amber-900/30 hover:border-amber-700/50 transition-all duration-300 block hover:-translate-y-1">
                   <div className="relative aspect-[4/3] overflow-hidden">
-                    <img src={m.imageUrl || 'https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?w=600&q=80'} alt={m.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                    <SmartImage
+                      src={m.imageUrl || 'https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?w=600&q=80'}
+                      alt={m.name}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      optimizeWidth={800}
+                    />
                     <div className="absolute inset-0 bg-gradient-to-t from-stone-950 via-stone-950/20 to-transparent" />
                     <div className="absolute top-3 right-3 flex items-center gap-1 px-2 py-1 rounded-full bg-stone-900/80 text-amber-400 text-xs font-medium">
                       <Star className="w-3.5 h-3.5 fill-amber-400" /> {m.rating ?? '—'}
@@ -151,7 +163,12 @@ export default function Home() {
               <ScrollReveal key={i} delay={i * 0.12}>
                 <div className="group rounded-2xl overflow-hidden border border-amber-900/30 hover:border-amber-700/40 transition bg-stone-900/40 hover:-translate-y-1 hover:shadow-xl hover:shadow-amber-900/10">
                 <div className="relative aspect-[4/3] overflow-hidden">
-                  <img src={item.image} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                  <SmartImage
+                    src={item.image}
+                    alt={item.title}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    optimizeWidth={800}
+                  />
                   <div className="absolute inset-0 bg-gradient-to-t from-stone-950 via-transparent to-transparent" />
                   <div className="absolute bottom-4 left-4 right-4 flex items-center gap-3">
                     <div className="h-10 w-10 rounded-xl bg-amber-500/90 flex items-center justify-center text-stone-900"><item.icon className="w-5 h-5" /></div>
@@ -167,9 +184,15 @@ export default function Home() {
       </section>
 
       <section
-        className="relative py-24 sm:py-32 px-4 sm:px-6 flex items-center justify-center"
-        style={{ background: `linear-gradient(135deg, rgba(12,10,9,0.92) 0%, rgba(127,29,29,0.85) 100%), url(${QUOTE_IMAGE}) center/cover no-repeat` }}
+        className="relative py-24 sm:py-32 px-4 sm:px-6 flex items-center justify-center overflow-hidden"
       >
+        <SmartImage
+          src={QUOTE_IMAGE}
+          alt="Prayer flags in the Himalayas"
+          className="absolute inset-0 w-full h-full object-cover"
+          optimizeWidth={1800}
+        />
+        <div className="absolute inset-0 bg-gradient-to-br from-stone-950/95 via-rose-950/70 to-stone-950/95" />
         <ScrollReveal>
         <div className="max-w-2xl mx-auto text-center">
           <Sparkles className="w-8 h-8 text-amber-400/80 mx-auto mb-4" />

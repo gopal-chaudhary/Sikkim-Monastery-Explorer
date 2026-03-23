@@ -7,6 +7,8 @@ import { MapPin, Navigation, Store } from 'lucide-react'
 import { Layout } from '../components/Layout'
 import { useMonasteries } from '../context/MonasteryContext'
 import { locationAPI } from '../api'
+import { EmptyState, ErrorState, OfflineBanner } from '../components/States'
+import { SmartImage } from '../components/SmartImage'
 
 const DEFAULT_CENTER = [27.533, 88.512]
 const SIKKIM_BOUNDS = [
@@ -40,9 +42,10 @@ function getLocationLabel(monastery) {
 }
 
 export default function MapPage() {
-  const { monasteries, loading: monasteryLoading } = useMonasteries()
+  const { monasteries, loading: monasteryLoading, error: monasteryError, online, refetch } = useMonasteries()
   const [userLocations, setUserLocations] = useState([])
   const [loadingLocations, setLoadingLocations] = useState(false)
+  const [locationsError, setLocationsError] = useState(null)
   const [failedImages, setFailedImages] = useState(new Set())
   const businessLabel = userLocations.length === 1 ? 'business' : 'businesses'
 
@@ -53,11 +56,12 @@ export default function MapPage() {
   const fetchUserLocations = async () => {
     try {
       setLoadingLocations(true)
+      setLocationsError(null)
       const response = await locationAPI.getAllActiveLocations()
       setUserLocations(response.data || [])
     } catch (error) {
       console.error('Failed to fetch user locations:', error)
-      // Don't show error toast, just silently fail
+      setLocationsError('Could not load nearby businesses right now.')
     } finally {
       setLoadingLocations(false)
     }
@@ -103,6 +107,7 @@ export default function MapPage() {
 
   return (
     <Layout>
+      {!online && <OfflineBanner onRetry={() => { refetch(); fetchUserLocations(); }} />}
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
         <div className="mb-6">
           <h1 className="font-heading text-3xl sm:text-4xl font-bold text-amber-50">Sikkim Map</h1>
@@ -113,6 +118,22 @@ export default function MapPage() {
 
         {monasteryLoading || loadingLocations ? (
           <div className="glass rounded-2xl p-8 text-stone-300">Loading map data...</div>
+        ) : monasteryError ? (
+          <ErrorState title="Couldn’t load map data" message={monasteryError} onRetry={refetch} />
+        ) : monasteryMarkers.length === 0 && userLocations.length === 0 ? (
+          <EmptyState
+            title="Nothing to show on the map yet"
+            message="No monasteries with coordinates or nearby listings are available right now."
+            action={
+              <button
+                type="button"
+                onClick={() => { refetch(); fetchUserLocations(); }}
+                className="mt-5 px-4 py-2 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-100 hover:bg-amber-500/20 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/40"
+              >
+                Refresh
+              </button>
+            }
+          />
         ) : (
           <div className="rounded-2xl overflow-hidden border border-amber-900/40 relative z-0" style={{ height: '70vh' }}>
             <MapContainer center={mapCenter} zoom={9} scrollWheelZoom maxBounds={SIKKIM_BOUNDS} maxBoundsViscosity={1.0} minZoom={8} maxZoom={14} className="h-full w-full">
@@ -129,7 +150,7 @@ export default function MapPage() {
                   html: hasValidImage
                     ? `
                       <div class="w-12 h-12 rounded-full border-2 border-amber-400 overflow-hidden shadow-lg cursor-pointer transform hover:scale-110 transition-transform">
-                        <img src="${monastery.imageUrl}" alt="${monastery.name}" class="w-full h-full object-cover" onerror="this.parentElement.innerHTML='<div style=\"width:100%; height:100%; background-color:#f59e0b;\"></div>'" />
+                        <img src="${monastery.imageUrl}" alt="${monastery.name}" class="w-full h-full object-cover" onerror="this.parentElement.innerHTML='<div class=&quot;w-full h-full bg-amber-500&quot;></div>'" />
                       </div>
                     `
                     : `
@@ -148,11 +169,12 @@ export default function MapPage() {
                     <Popup>
                       <div className="max-w-[230px] text-stone-900">
                         {monastery.imageUrl && !failedImages.has(monastery._id) && (
-                          <img
+                          <SmartImage
                             src={monastery.imageUrl}
                             alt={monastery.name}
                             className="w-full h-32 object-cover rounded-md mb-2"
                             onError={() => setFailedImages(prev => new Set([...prev, monastery._id]))}
+                            optimizeWidth={520}
                           />
                         )}
                         <p className="font-semibold text-sm">{monastery.name}</p>
@@ -193,11 +215,12 @@ export default function MapPage() {
                     <Popup>
                       <div className="max-w-[230px] text-stone-900">
                         {location.imageUrl && !failedImages.has(location._id) && (
-                          <img
+                          <SmartImage
                             src={location.imageUrl}
                             alt={location.name}
                             className="w-full h-32 object-cover rounded-md mb-2"
                             onError={() => setFailedImages(prev => new Set([...prev, location._id]))}
+                            optimizeWidth={520}
                           />
                         )}
                         <p className="font-semibold text-sm">{location.name}</p>
@@ -239,6 +262,11 @@ export default function MapPage() {
               <Store className="w-5 h-5" /> Listed Businesses
             </h2>
             <p className="text-stone-400 text-sm mb-3">Active listings with their type.</p>
+            {locationsError && (
+              <div className="mb-3 text-xs text-rose-200/90 bg-rose-950/30 border border-rose-900/30 rounded-lg px-3 py-2">
+                {locationsError}
+              </div>
+            )}
             <ul className="space-y-2 max-h-72 overflow-y-auto pr-1">
               {userLocations.length > 0 ? userLocations.map((location) => (
                 <li key={location._id} className="text-sm text-emerald-100/90 flex items-center justify-between gap-3">

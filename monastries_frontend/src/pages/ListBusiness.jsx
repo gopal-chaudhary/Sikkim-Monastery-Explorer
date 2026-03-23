@@ -168,7 +168,7 @@ export default function ListBusiness() {
     setLoading(true)
     try {
       // Create location
-      const locationResponse = await locationAPI.createLocation({
+      await locationAPI.createLocation({
         name: formData.name,
         type: formData.type,
         description: formData.description,
