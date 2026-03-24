@@ -66,7 +66,17 @@ authRouter.post("/signup",async (req,res) =>{
             }
         });
     }catch(err){
-        res.status(400).json({ success: false, message: err.message });
+        // Handle duplicate key error for unique email (E11000)
+        let message = err.message;
+        if (err.code === 11000 || (err.message && err.message.includes('E11000'))) {
+            // Prefer a clear, client-friendly message
+            if (err.keyValue && err.keyValue.emailId) {
+                message = 'User with this email already exists';
+            } else {
+                message = 'User already exists';
+            }
+        }
+        res.status(400).json({ success: false, message });
     }
 });
 
