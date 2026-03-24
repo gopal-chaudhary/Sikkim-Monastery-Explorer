@@ -1,4 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom'
+import { toast } from 'react-toastify'
 import { useAuth } from '../context/AuthContext'
 import {
   LogOut,
@@ -18,8 +19,15 @@ export function Layout({ children, noHero }) {
   const { theme, toggle } = useTheme()
 
   const handleLogout = async () => {
-    await logout()
-    navigate('/')
+    try {
+      const res = await logout()
+      const msg = res?.message || 'Logged out successfully'
+      toast.success(msg)
+    } catch (err) {
+      toast.error('Logout failed')
+    } finally {
+      navigate('/')
+    }
   }
 
   return (

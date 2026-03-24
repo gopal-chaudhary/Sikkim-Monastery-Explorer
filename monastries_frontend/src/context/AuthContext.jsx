@@ -39,9 +39,12 @@ export function AuthProvider({ children }) {
 
   const logout = async () => {
     try {
-      await api.post('/logout')
-    } finally {
+      const { data } = await api.post('/logout')
       setUser(null)
+      return data
+    } catch (err) {
+      setUser(null)
+      throw err
     }
   }
 
