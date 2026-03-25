@@ -10,10 +10,11 @@ export function AuthProvider({ children }) {
 
   async function fetchUser() {
     try {
-      const { data } = await api.get('/profile')
-      setUser(data)
-      return data
-    } catch {
+      const { data } = await api.get('/api/profile-new')
+      setUser(data.data) // Fix: user data is nested in data.data
+      return data.data
+    } catch (err) {
+      console.error('Failed to fetch user:', err)
       setUser(null)
       return null
     } finally {
@@ -46,7 +47,7 @@ export function AuthProvider({ children }) {
   }
 
   const updateProfile = async (body) => {
-    const { data } = await api.patch('/profile/edit', body)
+    const { data } = await api.patch('/api/profile-new', body)
     setUser((u) => (u ? { ...u, ...data.data } : null))
     return data
   }

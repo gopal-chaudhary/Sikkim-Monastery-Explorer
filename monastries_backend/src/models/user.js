@@ -6,7 +6,7 @@ const jwt = require("jsonwebtoken");
 const userSchema = new mongoose.Schema({
     firstName:{
         type:String,
-        reuired:true,
+        required:true,
         minLength: 3,
         index:true //This means this is index 
     },
@@ -63,6 +63,9 @@ const userSchema = new mongoose.Schema({
     photoUrl:{
         type: String,
     },
+    location:{
+        type: String,
+    },
     skills:{
         type: [String],
     },
@@ -90,34 +93,35 @@ const userSchema = new mongoose.Schema({
     timestamps:true
 });
 
-//but also don't good to create unnecessary index as this is very costly
-//when u create a lot of index this is also very difficult to db 
-//so please create and aware of all the index you made off.
-//why do we need indexing in DB?
-//what is advantages and disadvanatages of creating indexes in DB?
-// const user = mongoose.model("user",userSchema);
+// Compound indexes for common queries
+userSchema.index({ role: 1, contributionPoints: -1 }); // Leaderboard queries
+userSchema.index({ contributionsCount: -1 }); // Top contributors
+userSchema.index({ role: 1, isActive: 1 }); // Active users by role
+userSchema.index({ "skills": 1 }); // Skill-based searches
+userSchema.index({ createdAt: -1 }); // Recent users
 
-// user.find({firstName: "Tanush", lastName : "Arora"});
-// userSchema.index({firstName:1,lastName:1}); //this is known as the compound index
+// Text index for user search
+userSchema.index({ 
+    firstName: 'text', 
+    lastName: 'text', 
+    about: 'text',
+    skills: 'text'
+});
 
-//cannot use arrow function in that as they break logic
-//cannot use arrow function as this function is a very different implementation 
-// so inside arrow function this function will cannot work
+// User methods for authentication
 userSchema.methods.getJWT = async function (){
-
-    //This function will have a very closely related to user schema as every user has their own
-    //different json web token 
     const user = this;
     const token = await jwt.sign({_id:user._id},process.env.JWT_SECRET,{
         expiresIn:"7d",
     });
     return token;
 };
+
 userSchema.methods.validatePassword = async function(passwordInputByUser){
     const user = this;
     const passwordHash = user.password;
     const isPasswordValid = await bcrypt.compare(passwordInputByUser,passwordHash);
     return isPasswordValid;
-}
+};
 
 module.exports = mongoose.model('user',userSchema);

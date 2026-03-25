@@ -54,7 +54,17 @@ const monasterySchema = new mongoose.Schema({
     },
     imageUrl: {
         type: String,
-        required: true
+        required: false,
+        default: null
+    },
+    imageVerified: {
+        type: Boolean,
+        default: false
+    },
+    imageSource: {
+        type: String,
+        enum: ['manual', 'wikipedia', 'unsplash', 'fallback', 'placeholder'],
+        default: 'placeholder'
     },
     features: {
         type: [String],
@@ -180,4 +190,15 @@ monasterySchema.index({
     locationText: 'text'
 });
 
-module.exports = mongoose.model('Monastery', monasterySchema);
+// Compound indexes for common queries
+monasterySchema.index({ region: 1, rating: -1 }); // Region-based queries with rating sort
+monasterySchema.index({ isActive: 1, rating: -1 }); // Active monasteries by rating
+monasterySchema.index({ visitors: -1 }); // Popular monasteries
+monasterySchema.index({ established: 1 }); // Historical queries
+monasterySchema.index({ sect: 1, region: 1 }); // Sect by region
+monasterySchema.index({ imageSource: 1, imageVerified: 1 }); // Image queries
+
+// Create 2dsphere index for geospatial queries
+monasterySchema.index({ coordinates: "2dsphere" });
+
+module.exports = mongoose.model('monastery', monasterySchema);

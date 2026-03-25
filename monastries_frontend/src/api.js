@@ -6,7 +6,34 @@ export const api = axios.create({
   baseURL: API_URL,
   withCredentials: true,
   headers: { 'Content-Type': 'application/json' },
+  // Prevent caching issues
+  paramsSerializer: {
+    indexes: null
+  }
 })
+
+// Add cache-busting timestamp to GET requests
+api.interceptors.request.use((config) => {
+  if (config.method === 'get') {
+    config.params = {
+      ...config.params,
+      _t: Date.now()
+    }
+  }
+  return config
+})
+
+// Add response interceptor for error handling
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    // Log errors for debugging
+    if (error.response) {
+      console.error('API Error:', error.response.status, error.response.data)
+    }
+    return Promise.reject(error)
+  }
+)
 
 // Parse error response (backend may send JSON or text)
 export function getErrorMessage(err) {

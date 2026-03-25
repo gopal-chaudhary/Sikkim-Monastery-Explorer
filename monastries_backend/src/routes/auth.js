@@ -4,7 +4,6 @@ const {validateSignUpData} = require("../utils/validation");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/user");
-const user = require("../models/user");
 // authRouter.get('/')
 
 // app.use() is same as router.use() there is almost no difference 
@@ -48,7 +47,7 @@ authRouter.post("/signup",async (req,res) =>{
         res.cookie("token", token, {
             httpOnly: true,
             sameSite: "Lax",
-            expires: new Date(Date.now() + 8 * 360000),
+            expires: new Date(Date.now() + 7 * 24 * 3600000),
         });
         
         res.json({
@@ -96,7 +95,7 @@ authRouter.post("/login" ,async (req,res) =>{
             res.cookie("token", token, {
             httpOnly: true,
             sameSite: "Lax",
-            expires: new Date(Date.now() + 8 * 360000),
+            expires: new Date(Date.now() + 7 * 24 * 3600000),
             });
             res.json({
                 _id: users._id,

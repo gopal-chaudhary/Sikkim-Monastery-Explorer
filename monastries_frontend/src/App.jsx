@@ -5,6 +5,8 @@ import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import { AuthProvider } from './context/AuthContext'
 import { MonasteryProvider } from './context/MonasteryContext'
+import { ThemeProvider } from './context/ThemeContext'
+import ErrorBoundary from './components/ErrorBoundary'
 import './App.css'
 
 const Home = lazy(() => import('./pages/Home'))
@@ -15,6 +17,10 @@ const MapPage = lazy(() => import('./pages/MapPage'))
 const MonasteryDetail = lazy(() => import('./pages/MonasteryDetail'))
 const MonasteryWiki = lazy(() => import('./pages/MonasteryWiki'))
 const Profile = lazy(() => import('./pages/Profile'))
+const ProfileNew = lazy(() => import('./pages/ProfileNew'))
+const ProfilePremium = lazy(() => import('./pages/ProfilePremium'))
+const ProfileClean = lazy(() => import('./pages/ProfileClean'))
+const ProfileFixed = lazy(() => import('./pages/ProfileFixed'))
 const Contribute = lazy(() => import('./pages/Contribute'))
 const Leaderboard = lazy(() => import('./pages/Leaderboard'))
 const Admin = lazy(() => import('./pages/Admin'))
@@ -22,6 +28,7 @@ const MyContributions = lazy(() => import('./pages/MyContributions'))
 const MyLocations = lazy(() => import('./pages/MyLocations'))
 const LocationDetail = lazy(() => import('./pages/LocationDetail'))
 const BecomeGuide = lazy(() => import('./pages/BecomeGuide'))
+const BecomeGuideEnhanced = lazy(() => import('./pages/BecomeGuideEnhanced'))
 const MyGuideProfile = lazy(() => import('./pages/MyGuideProfile'))
 const ListBusiness = lazy(() => import('./pages/ListBusiness'))
 const Status = lazy(() => import('./pages/Status'))
@@ -66,9 +73,14 @@ function AnimatedRoutes() {
             <Route path="/monastery/:id/wiki" element={<MonasteryWiki />} />
             <Route path="/location/:id" element={<LocationDetail />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/profile-new" element={<ProfileNew />} />
+            <Route path="/profile-premium" element={<ProfilePremium />} />
+            <Route path="/profile-clean" element={<ProfileClean />} />
+            <Route path="/profile-fixed" element={<ProfileFixed />} />
             <Route path="/my-contributions" element={<MyContributions />} />
             <Route path="/my-locations" element={<MyLocations />} />
             <Route path="/become-guide" element={<BecomeGuide />} />
+            <Route path="/become-guide-enhanced" element={<BecomeGuideEnhanced />} />
             <Route path="/my-guide-profile" element={<MyGuideProfile />} />
             <Route path="/list-business" element={<ListBusiness />} />
             <Route path="/contribute" element={<Contribute />} />
@@ -84,25 +96,33 @@ function AnimatedRoutes() {
 
 export default function App() {
   return (
-    <AuthProvider>
-      <MonasteryProvider>
-        <BrowserRouter>
-          <AnimatedRoutes />
-          <ToastContainer
-            position="top-right"
-            autoClose={4000}
-            hideProgressBar={false}
-            newestOnTop
-            closeOnClick
-            rtl={false}
-            pauseOnFocusLoss
-            draggable
-            pauseOnHover
-            theme="dark"
-            toastStyle={{ background: '#1c1917', color: '#fafaf9', border: '1px solid rgba(245,158,11,0.3)' }}
-          />
-        </BrowserRouter>
-      </MonasteryProvider>
-    </AuthProvider>
+    <ErrorBoundary>
+      <ThemeProvider>
+        <AuthProvider>
+          <MonasteryProvider>
+            <BrowserRouter>
+              <AnimatedRoutes />
+              <ToastContainer
+                position="top-right"
+                autoClose={4000}
+                hideProgressBar={false}
+                newestOnTop
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                theme="dark"
+                toastStyle={{ 
+                  background: 'var(--bg-card)', 
+                  color: 'var(--text-primary)', 
+                  border: '1px solid var(--border-primary)' 
+                }}
+              />
+            </BrowserRouter>
+          </MonasteryProvider>
+        </AuthProvider>
+      </ThemeProvider>
+    </ErrorBoundary>
   )
 }

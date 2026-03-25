@@ -19,14 +19,14 @@ const RUNNING_ITEMS = [
 
 function Card({ name, tag, rating }) {
   return (
-    <div className="flex-shrink-0 w-[220px] sm:w-[260px] mx-2 rounded-xl border border-amber-900/40 bg-stone-900/70 backdrop-blur p-4 hover:border-amber-700/50 hover:bg-stone-800/80 transition-all duration-300">
+    <div className="flex-shrink-0 w-[220px] sm:w-[260px] mx-2 rounded-xl border border-[var(--border-primary)] bg-[var(--bg-card)] backdrop-blur p-4 hover:border-[var(--accent-border)] hover:bg-[var(--bg-hover)] transition-all duration-300">
       <div className="flex items-center justify-between mb-2">
-        <span className="text-[10px] uppercase tracking-wider text-amber-500/90 font-medium">{tag}</span>
-        <span className="flex items-center gap-0.5 text-amber-400 text-xs">
-          <Star className="w-3.5 h-3.5 fill-amber-400" /> {rating}
+        <span className="text-[10px] uppercase tracking-wider text-[var(--text-secondary)] font-medium">{tag}</span>
+        <span className="flex items-center gap-0.5 text-[var(--text-primary)] text-xs">
+          <Star className="w-3.5 h-3.5 fill-[var(--accent-primary)]" /> {rating}
         </span>
       </div>
-      <p className="font-heading font-semibold text-amber-50 text-sm sm:text-base leading-tight">{name}</p>
+      <p className="font-heading font-semibold text-[var(--text-primary)] text-sm sm:text-base leading-tight">{name}</p>
     </div>
   )
 }
@@ -36,16 +36,16 @@ export function Marquee() {
   const tagsDuplicated = [...TAGS_STRIP, ...TAGS_STRIP]
   return (
     <>
-      <div className="relative overflow-hidden py-3 border-b border-amber-900/20 bg-stone-950/60">
+      <div className="relative overflow-hidden py-3 border-b border-[var(--border-primary)] bg-[var(--bg-primary)]">
         <div className="marquee-track-reverse flex gap-8">
           {tagsDuplicated.map((tag, i) => (
-            <span key={`tag-${i}`} className="flex-shrink-0 text-xs sm:text-sm font-medium text-amber-200/70 uppercase tracking-widest whitespace-nowrap">
+            <span key={`tag-${i}`} className="flex-shrink-0 text-xs sm:text-sm font-medium text-[var(--text-secondary)] uppercase tracking-widest whitespace-nowrap">
               {tag}
             </span>
           ))}
         </div>
       </div>
-      <div className="relative overflow-hidden py-4 border-b border-amber-900/30 bg-stone-950/80">
+      <div className="relative overflow-hidden py-4 border-b border-[var(--border-primary)] bg-[var(--bg-card)]">
         <div className="marquee-track">
           {duplicated.map((item, i) => (
             <Card key={`${item.name}-${i}`} name={item.name} tag={item.tag} rating={item.rating} />

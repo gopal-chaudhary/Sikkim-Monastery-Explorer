@@ -163,64 +163,64 @@ export default function MonasteryDetail() {
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
-        <div className="rounded-2xl overflow-hidden bg-stone-900/60 border border-amber-900/30 mb-8">
+        <div className="rounded-2xl overflow-hidden bg-[var(--bg-card)] border border-[var(--border-primary)] mb-8">
           <div className="relative aspect-[21/9] sm:aspect-[3/1]">
             <SmartImage
               src={monastery.imageUrl || 'https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?w=1200'}
               alt={monastery.name}
               className="w-full h-full object-cover"
               loading="eager"
-              fetchpriority="high"
+              fetchPriority="high"
               optimizeWidth={1400}
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-stone-950 via-transparent to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-[var(--bg-primary)] via-transparent to-transparent" />
             <div className="absolute bottom-4 left-4 right-4 flex items-center gap-2">
-              <span className="px-2 py-0.5 rounded bg-amber-500/90 text-stone-900 text-xs font-semibold">{monastery.region}</span>
-              <span className="flex items-center gap-1 text-amber-400 text-sm"><Star className="w-4 h-4 fill-amber-400" /> {monastery.rating}</span>
+              <span className="px-2 py-0.5 rounded bg-[var(--accent-primary)] text-[var(--bg-primary)] text-xs font-semibold">{monastery.region}</span>
+              <span className="flex items-center gap-1 text-[var(--accent-primary)] text-sm"><Star className="w-4 h-4 fill-[var(--accent-primary)]" /> {monastery.rating}</span>
             </div>
           </div>
           <div className="p-6 sm:p-8">
-            <h1 className="font-heading text-3xl sm:text-4xl font-bold text-amber-50">{monastery.name}</h1>
-            <p className="text-stone-400 mt-1 flex items-center gap-1">
+            <h1 className="font-heading text-3xl sm:text-4xl font-bold text-[var(--text-primary)]">{monastery.name}</h1>
+            <p className="text-[var(--text-secondary)] mt-1 flex items-center gap-1">
               <MapPin className="w-4 h-4" /> 
               {monastery.location?.district || monastery.location?.village || monastery.region || 'Sikkim'}
               {monastery.location?.state && `, ${monastery.location.state}`}
             </p>
             
             {monastery.link && (
-              <a href={monastery.link} target="_blank" rel="noopener noreferrer" className="text-amber-400 hover:text-amber-300 text-sm mt-1 inline-flex items-center gap-1">
+              <a href={monastery.link} target="_blank" rel="noopener noreferrer" className="text-[var(--accent-primary)] hover:text-[var(--accent-hover)] text-sm mt-1 inline-flex items-center gap-1">
                 <BookOpen className="w-3 h-3" /> Wikipedia Article
               </a>
             )}
             
-            <p className="mt-4 text-stone-300 leading-relaxed">{monastery.description}</p>
+            <p className="mt-4 text-[var(--text-secondary)] leading-relaxed">{monastery.description}</p>
             
             {/* Quick Info */}
             <div className="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
               {monastery.established && (
-                <div><p className="text-stone-500">Established</p><p className="text-amber-100 font-medium">{monastery.established}</p></div>
+                <div><p className="text-[var(--text-muted)]">Established</p><p className="text-[var(--text-primary)] font-medium">{monastery.established}</p></div>
               )}
               {monastery.foundedBy && (
-                <div><p className="text-stone-500">Founded By</p><p className="text-amber-100 font-medium">{monastery.foundedBy}</p></div>
+                <div><p className="text-[var(--text-muted)]">Founded By</p><p className="text-[var(--text-primary)] font-medium">{monastery.foundedBy}</p></div>
               )}
               {monastery.sect && (
-                <div><p className="text-stone-500">Sect</p><p className="text-amber-100 font-medium">{monastery.sect}</p></div>
+                <div><p className="text-[var(--text-muted)]">Sect</p><p className="text-[var(--text-primary)] font-medium">{monastery.sect}</p></div>
               )}
               {monastery.monks && (
-                <div><p className="text-stone-500 flex items-center gap-1"><Users className="w-3 h-3" /> Monks</p><p className="text-amber-100 font-medium">{monastery.monks}</p></div>
+                <div><p className="text-[var(--text-muted)] flex items-center gap-1"><Users className="w-3 h-3" /> Monks</p><p className="text-[var(--text-primary)] font-medium">{monastery.monks}</p></div>
               )}
-              <div><p className="text-stone-500">Opening</p><p className="text-amber-100 font-medium">{monastery.openingHours || '—'}</p></div>
-              <div><p className="text-stone-500">Entry</p><p className="text-amber-100 font-medium">{monastery.entryFee || 'Free'}</p></div>
-              <div><p className="text-stone-500">Best time</p><p className="text-amber-100 font-medium">{monastery.bestTimeToVisit || '—'}</p></div>
+              <div><p className="text-[var(--text-muted)]">Opening</p><p className="text-[var(--text-primary)] font-medium">{monastery.openingHours || '—'}</p></div>
+              <div><p className="text-[var(--text-muted)]">Entry</p><p className="text-[var(--text-primary)] font-medium">{monastery.entryFee || 'Free'}</p></div>
+              <div><p className="text-[var(--text-muted)]">Best time</p><p className="text-[var(--text-primary)] font-medium">{monastery.bestTimeToVisit || '—'}</p></div>
               {monastery.altitude && (
-                <div><p className="text-stone-500 flex items-center gap-1"><Mountain className="w-3 h-3" /> Altitude</p><p className="text-amber-100 font-medium">{monastery.altitude}m</p></div>
+                <div><p className="text-[var(--text-muted)] flex items-center gap-1"><Mountain className="w-3 h-3" /> Altitude</p><p className="text-[var(--text-primary)] font-medium">{monastery.altitude}m</p></div>
               )}
             </div>
             
             <div className="mt-5">
               <Link
                 to={`/monastery/${id}/wiki`}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-stone-950/60 border border-amber-900/40 text-amber-200 hover:bg-stone-950/80 hover:border-amber-500/40 transition"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[var(--bg-secondary)] border border-[var(--border-primary)] text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)] hover:border-[var(--accent-border)] transition"
               >
                 <BookOpen className="w-4 h-4" />
                 Explore Wikipedia details & nearby hotels
@@ -229,7 +229,7 @@ export default function MonasteryDetail() {
             
             <div className="mt-4 flex flex-wrap gap-2">
               {(monastery.features || []).map((f, i) => (
-                <span key={i} className="px-2.5 py-1 rounded-full bg-amber-900/50 text-amber-100 text-xs border border-amber-700/50">{f}</span>
+                <span key={i} className="px-2.5 py-1 rounded-full bg-[var(--accent-bg)] text-[var(--accent-primary)] text-xs border border-[var(--accent-border)]">{f}</span>
               ))}
             </div>
           </div>
@@ -241,13 +241,13 @@ export default function MonasteryDetail() {
           {/* History Section */}
           {monastery.history && Object.keys(monastery.history).length > 0 && (
             <section className="glass rounded-2xl p-6">
-              <h2 className="font-heading text-xl font-bold text-amber-50 mb-4 flex items-center gap-2">
+              <h2 className="font-heading text-xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
                 <Clock className="w-5 h-5" /> History
               </h2>
-              <div className="space-y-3 text-stone-300">
+              <div className="space-y-3 text-[var(--text-secondary)]">
                 {Object.entries(monastery.history).map(([key, value]) => (
                   <div key={key}>
-                    <h3 className="text-amber-200 font-semibold text-sm capitalize mb-1">
+                    <h3 className="text-[var(--accent-primary)] font-semibold text-sm capitalize mb-1">
                       {key.replace(/([A-Z])/g, ' $1').replace(/(\d+)/g, ' $1').trim()}
                     </h3>
                     <p className="text-sm leading-relaxed">{value}</p>
@@ -260,13 +260,13 @@ export default function MonasteryDetail() {
           {/* Architecture Section */}
           {monastery.architecture && Object.keys(monastery.architecture).length > 0 && (
             <section className="glass rounded-2xl p-6">
-              <h2 className="font-heading text-xl font-bold text-amber-50 mb-4 flex items-center gap-2">
+              <h2 className="font-heading text-xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
                 <Church className="w-5 h-5" /> Architecture
               </h2>
-              <div className="space-y-3 text-stone-300">
+              <div className="space-y-3 text-[var(--text-secondary)]">
                 {monastery.architectureStyle && (
                   <div>
-                    <p className="text-amber-200 font-semibold text-sm mb-1">Style</p>
+                    <p className="text-[var(--accent-primary)] font-semibold text-sm mb-1">Style</p>
                     <p className="text-sm">{monastery.architectureStyle}</p>
                   </div>
                 )}
@@ -274,7 +274,7 @@ export default function MonasteryDetail() {
                   if (Array.isArray(value)) {
                     return (
                       <div key={key}>
-                        <p className="text-amber-200 font-semibold text-sm mb-1 capitalize">
+                        <p className="text-[var(--accent-primary)] font-semibold text-sm mb-1 capitalize">
                           {key.replace(/([A-Z])/g, ' $1').trim()}
                         </p>
                         <ul className="list-disc list-inside space-y-1">
@@ -287,7 +287,7 @@ export default function MonasteryDetail() {
                   }
                   return (
                     <div key={key}>
-                      <p className="text-amber-200 font-semibold text-sm mb-1 capitalize">
+                      <p className="text-[var(--accent-primary)] font-semibold text-sm mb-1 capitalize">
                         {key.replace(/([A-Z])/g, ' $1').trim()}
                       </p>
                       <p className="text-sm leading-relaxed">{value}</p>
@@ -301,14 +301,14 @@ export default function MonasteryDetail() {
           {/* Festivals Section */}
           {monastery.festivals && monastery.festivals.length > 0 && (
             <section className="glass rounded-2xl p-6">
-              <h2 className="font-heading text-xl font-bold text-amber-50 mb-4 flex items-center gap-2">
+              <h2 className="font-heading text-xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
                 <Sparkles className="w-5 h-5" /> Festivals & Celebrations
               </h2>
               <div className="space-y-4">
                 {monastery.festivals.map((festival, i) => (
-                  <div key={i} className="p-4 rounded-xl bg-stone-900/60 border border-amber-900/30">
-                    <h3 className="text-amber-200 font-semibold mb-1">{festival.name}</h3>
-                    <p className="text-stone-300 text-sm leading-relaxed">{festival.description}</p>
+                  <div key={i} className="p-4 rounded-xl bg-[var(--bg-secondary)] border border-[var(--border-primary)]">
+                    <h3 className="text-[var(--accent-primary)] font-semibold mb-1">{festival.name}</h3>
+                    <p className="text-[var(--text-secondary)] text-sm leading-relaxed">{festival.description}</p>
                   </div>
                 ))}
               </div>
@@ -318,10 +318,10 @@ export default function MonasteryDetail() {
           {/* Deities Worshipped */}
           {monastery.deitiesWorshipped && monastery.deitiesWorshipped.length > 0 && (
             <section className="glass rounded-2xl p-6">
-              <h2 className="font-heading text-xl font-bold text-amber-50 mb-4">Deities Worshipped</h2>
+              <h2 className="font-heading text-xl font-bold text-[var(--text-primary)] mb-4">Deities Worshipped</h2>
               <div className="flex flex-wrap gap-2">
                 {monastery.deitiesWorshipped.map((deity, i) => (
-                  <span key={i} className="px-3 py-1.5 rounded-lg bg-amber-900/50 text-amber-100 text-sm border border-amber-700/50">
+                  <span key={i} className="px-3 py-1.5 rounded-lg bg-[var(--accent-bg)] text-[var(--accent-primary)] text-sm border border-[var(--accent-border)]">
                     {deity}
                   </span>
                 ))}
@@ -332,21 +332,21 @@ export default function MonasteryDetail() {
           {/* Cultural Significance */}
           {monastery.culturalSignificance && (
             <section className="glass rounded-2xl p-6">
-              <h2 className="font-heading text-xl font-bold text-amber-50 mb-4">Cultural Significance</h2>
-              <p className="text-stone-300 leading-relaxed">{monastery.culturalSignificance}</p>
+              <h2 className="font-heading text-xl font-bold text-[var(--text-primary)] mb-4">Cultural Significance</h2>
+              <p className="text-[var(--text-secondary)] leading-relaxed">{monastery.culturalSignificance}</p>
             </section>
           )}
 
           {/* Infrastructure */}
           {monastery.infrastructure && Object.keys(monastery.infrastructure).length > 0 && (
             <section className="glass rounded-2xl p-6">
-              <h2 className="font-heading text-xl font-bold text-amber-50 mb-4">Infrastructure & Facilities</h2>
-              <div className="space-y-3 text-stone-300">
+              <h2 className="font-heading text-xl font-bold text-[var(--text-primary)] mb-4">Infrastructure & Facilities</h2>
+              <div className="space-y-3 text-[var(--text-secondary)]">
                 {Object.entries(monastery.infrastructure).map(([key, value]) => {
                   if (Array.isArray(value)) {
                     return (
                       <div key={key}>
-                        <p className="text-amber-200 font-semibold text-sm mb-1 capitalize">
+                        <p className="text-[var(--accent-primary)] font-semibold text-sm mb-1 capitalize">
                           {key.replace(/([A-Z])/g, ' $1').trim()}
                         </p>
                         <ul className="list-disc list-inside space-y-1">
@@ -359,7 +359,7 @@ export default function MonasteryDetail() {
                   }
                   return (
                     <div key={key}>
-                      <p className="text-amber-200 font-semibold text-sm mb-1 capitalize">
+                      <p className="text-[var(--accent-primary)] font-semibold text-sm mb-1 capitalize">
                         {key.replace(/([A-Z])/g, ' $1').trim()}
                       </p>
                       <p className="text-sm">{value}</p>
@@ -372,14 +372,14 @@ export default function MonasteryDetail() {
 
           {/* Earthquake Damage / Restoration */}
           {(monastery.earthquakeDamage || monastery.restoration) && (
-            <section className="glass rounded-2xl p-6 border-l-4 border-amber-600">
-              <h2 className="font-heading text-xl font-bold text-amber-50 mb-4 flex items-center gap-2">
+            <section className="glass rounded-2xl p-6 border-l-4 border-[var(--accent-primary)]">
+              <h2 className="font-heading text-xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
                 <AlertTriangle className="w-5 h-5" /> Conservation & Restoration
               </h2>
-              <div className="space-y-3 text-stone-300">
+              <div className="space-y-3 text-[var(--text-secondary)]">
                 {monastery.earthquakeDamage && (
                   <div>
-                    <p className="text-amber-200 font-semibold text-sm mb-2">Earthquake Damage</p>
+                    <p className="text-[var(--accent-primary)] font-semibold text-sm mb-2">Earthquake Damage</p>
                     {typeof monastery.earthquakeDamage === 'object' ? (
                       Object.entries(monastery.earthquakeDamage).map(([key, value]) => (
                         <p key={key} className="text-sm leading-relaxed mb-2">
@@ -393,7 +393,7 @@ export default function MonasteryDetail() {
                 )}
                 {monastery.restoration && (
                   <div>
-                    <p className="text-amber-200 font-semibold text-sm mb-2">Restoration</p>
+                    <p className="text-[var(--accent-primary)] font-semibold text-sm mb-2">Restoration</p>
                     {typeof monastery.restoration === 'object' && monastery.restoration.info ? (
                       <p className="text-sm leading-relaxed">{monastery.restoration.info}</p>
                     ) : (
@@ -408,10 +408,10 @@ export default function MonasteryDetail() {
           {/* Nearby Attractions */}
           {monastery.nearbyAttractions && monastery.nearbyAttractions.length > 0 && (
             <section className="glass rounded-2xl p-6">
-              <h2 className="font-heading text-xl font-bold text-amber-50 mb-4">Nearby Attractions</h2>
+              <h2 className="font-heading text-xl font-bold text-[var(--text-primary)] mb-4">Nearby Attractions</h2>
               <div className="flex flex-wrap gap-2">
                 {monastery.nearbyAttractions.map((attraction, i) => (
-                  <span key={i} className="px-3 py-1.5 rounded-lg bg-stone-900/60 text-amber-100 text-sm border border-amber-900/40">
+                  <span key={i} className="px-3 py-1.5 rounded-lg bg-[var(--bg-secondary)] text-[var(--text-secondary)] text-sm border border-[var(--border-primary)]">
                     {attraction}
                   </span>
                 ))}
@@ -423,10 +423,10 @@ export default function MonasteryDetail() {
         {/* Map Section */}
         {monastery.coordinates?.latitude && monastery.coordinates?.longitude && (
           <section className="mb-8">
-            <h2 className="font-heading text-xl font-bold text-amber-50 mb-4 flex items-center gap-2">
+            <h2 className="font-heading text-xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
               <MapPin className="w-5 h-5" /> Location & Nearby Places
             </h2>
-            <div className="rounded-2xl overflow-hidden border border-amber-900/40 relative z-0" style={{ height: '50vh', minHeight: '400px' }}>
+            <div className="rounded-2xl overflow-hidden border border-[var(--border-primary)] relative z-0" style={{ height: '50vh', minHeight: '400px' }}>
               <MapContainer 
                 center={[monastery.coordinates.latitude, monastery.coordinates.longitude]} 
                 zoom={12} 
@@ -443,8 +443,8 @@ export default function MonasteryDetail() {
                   position={[monastery.coordinates.latitude, monastery.coordinates.longitude]}
                   icon={L.divIcon({
                     html: `
-                      <div class="w-12 h-12 rounded-full border-3 border-amber-400 overflow-hidden shadow-xl cursor-pointer transform hover:scale-110 transition-transform">
-                        <img src="${monastery.imageUrl || 'https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?w=200'}" alt="${monastery.name}" class="w-full h-full object-cover" onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=\\'w-full h-full bg-amber-500 flex items-center justify-center text-2xl\\'>🏛️</div>'" />
+                      <div class="w-12 h-12 rounded-full border-3 border-[var(--accent-primary)] overflow-hidden shadow-xl cursor-pointer transform hover:scale-110 transition-transform">
+                        <img src="${monastery.imageUrl || 'https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?w=200'}" alt="${monastery.name}" class="w-full h-full object-cover" onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=\\'w-full h-full bg-[var(--accent-primary)] flex items-center justify-center text-2xl\\'>🏛️</div>'" />
                       </div>
                     `,
                     iconSize: [48, 48],
@@ -453,8 +453,8 @@ export default function MonasteryDetail() {
                 >
                   <Popup>
                     <div className="text-sm max-w-xs">
-                      <p className="font-semibold text-amber-600 mb-1">{monastery.name}</p>
-                      <p className="text-xs text-stone-600">{monastery.location?.district || monastery.location?.village || 'Sikkim'}</p>
+                      <p className="font-semibold text-[var(--accent-primary)] mb-1">{monastery.name}</p>
+                      <p className="text-xs text-[var(--text-secondary)]">{monastery.location?.district || monastery.location?.village || 'Sikkim'}</p>
                     </div>
                   </Popup>
                 </Marker>
@@ -494,7 +494,7 @@ export default function MonasteryDetail() {
                           {location.phone && (
                             <p className="text-xs mt-1">Ph: {location.phone}</p>
                           )}
-                          <Link to={`/location/${location._id}`} className="text-xs text-blue-700 underline mt-2 inline-block">
+                          <Link to={`/location/${location._id}`} className="text-xs text-[var(--accent-primary)] underline mt-2 inline-block">
                             View details
                           </Link>
                         </div>
@@ -504,7 +504,7 @@ export default function MonasteryDetail() {
                 })}
               </MapContainer>
             </div>
-            <p className="text-stone-400 text-xs mt-2">
+            <p className="text-[var(--text-muted)] text-xs mt-2">
               {userLocations.length} nearby {userLocations.length === 1 ? 'business' : 'businesses'} shown on map
             </p>
           </section>
@@ -512,38 +512,38 @@ export default function MonasteryDetail() {
 
         {/* Travel guide */}
         <section className="mb-8">
-          <h2 className="font-heading text-xl font-bold text-amber-50 mb-4 flex items-center gap-2"><Compass className="w-5 h-5" /> Travel guide</h2>
-          {guideLoading && <p className="text-stone-400 text-sm">Loading travel info...</p>}
+          <h2 className="font-heading text-xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2"><Compass className="w-5 h-5" /> Travel guide</h2>
+          {guideLoading && <p className="text-[var(--text-muted)] text-sm">Loading travel info...</p>}
           {travelGuide && !guideLoading && (
             <div className="glass rounded-2xl p-6 space-y-4">
               {travelGuide.recommendedHotel && (
-                <div className="flex items-start gap-3 p-3 rounded-xl bg-stone-900/60">
-                  <Hotel className="w-5 h-5 text-amber-500 mt-0.5" />
+                <div className="flex items-start gap-3 p-3 rounded-xl bg-[var(--bg-secondary)]">
+                  <Hotel className="w-5 h-5 text-[var(--accent-primary)] mt-0.5" />
                   <div>
-                    <p className="font-medium text-amber-100">Recommended stay: {travelGuide.recommendedHotel.name}</p>
-                    <p className="text-stone-400 text-sm">{travelGuide.recommendedHotel.reason}</p>
+                    <p className="font-medium text-[var(--text-primary)]">Recommended stay: {travelGuide.recommendedHotel.name}</p>
+                    <p className="text-[var(--text-muted)] text-sm">{travelGuide.recommendedHotel.reason}</p>
                   </div>
                 </div>
               )}
               {travelGuide.hotels && travelGuide.hotels.length > 0 && (
                 <div>
-                  <p className="text-stone-400 text-sm mb-2">Nearby hotels ({travelGuide.hotels.length})</p>
+                  <p className="text-[var(--text-muted)] text-sm mb-2">Nearby hotels ({travelGuide.hotels.length})</p>
                   <ul className="space-y-2 max-h-48 overflow-y-auto">
                     {travelGuide.hotels.slice(0, 5).map((h, i) => (
-                      <li key={i} className="text-sm text-amber-100/90">{h.name} — {h.distance?.text || '—'} · {h.rating}/5</li>
+                      <li key={i} className="text-sm text-[var(--text-primary)]">{h.name} — {h.distance?.text || '—'} · {h.rating}/5</li>
                     ))}
                   </ul>
                 </div>
               )}
               {travelGuide.travelTips && (
                 <div>
-                  <p className="text-stone-400 text-sm mb-1">Tips</p>
-                  <p className="text-sm text-amber-100/90">{travelGuide.travelTips.thingsToCarry?.join(', ')}</p>
+                  <p className="text-[var(--text-muted)] text-sm mb-1">Tips</p>
+                  <p className="text-sm text-[var(--text-primary)]">{travelGuide.travelTips.thingsToCarry?.join(', ')}</p>
                 </div>
               )}
             </div>
           )}
-          {!travelGuide && !guideLoading && <p className="text-stone-500 text-sm">Travel guide not available for this monastery.</p>}
+          {!travelGuide && !guideLoading && <p className="text-[var(--text-muted)] text-sm">Travel guide not available for this monastery.</p>}
         </section>
 
         {/* Reviews Section */}
@@ -554,34 +554,34 @@ export default function MonasteryDetail() {
         {/* Tourist Guides Section */}
         {guides && guides.length > 0 && (
           <section className="mb-8">
-            <h2 className="font-heading text-xl font-bold text-amber-50 mb-4 flex items-center gap-2">
+            <h2 className="font-heading text-xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
               <UserCircle className="w-5 h-5" /> Available Tourist Guides
             </h2>
-            <p className="text-stone-400 text-sm mb-4">
+            <p className="text-[var(--text-secondary)] text-sm mb-4">
               Connect with verified local guides who specialize in this monastery and surrounding areas.
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {guides.map((guide) => (
-                <div key={guide._id} className="glass rounded-2xl p-5 border border-amber-900/30 hover:border-amber-700/50 transition">
+                <div key={guide._id} className="glass rounded-2xl p-5 border border-[var(--border-primary)] hover:border-[var(--accent-border)] transition">
                   <div className="flex items-start gap-4">
                     {guide.profilePhoto ? (
                       <SmartImage
                         src={guide.profilePhoto}
                         alt={guide.guideName}
-                        className="w-16 h-16 rounded-full object-cover border-2 border-amber-500"
+                        className="w-16 h-16 rounded-full object-cover border-2 border-[var(--accent-primary)]"
                         optimizeWidth={160}
                       />
                     ) : (
-                      <div className="w-16 h-16 rounded-full bg-amber-900/50 flex items-center justify-center border-2 border-amber-500">
-                        <UserCircle className="w-10 h-10 text-amber-300" />
+                      <div className="w-16 h-16 rounded-full bg-[var(--accent-bg)] flex items-center justify-center border-2 border-[var(--accent-primary)]">
+                        <UserCircle className="w-10 h-10 text-[var(--accent-primary)]" />
                       </div>
                     )}
                     
                     <div className="flex-1">
                       <div className="flex items-start justify-between mb-1">
-                        <h3 className="font-semibold text-amber-100">{guide.guideName}</h3>
+                        <h3 className="font-semibold text-[var(--text-primary)]">{guide.guideName}</h3>
                         {guide.isVerified && (
-                          <span className="flex items-center gap-1 text-xs bg-green-900/50 text-green-100 px-2 py-0.5 rounded-full border border-green-700/50">
+                          <span className="flex items-center gap-1 text-xs bg-green-500/10 text-green-600 px-2 py-0.5 rounded-full border border-green-500/20">
                             <Award className="w-3 h-3" /> Verified
                           </span>
                         )}
@@ -589,15 +589,15 @@ export default function MonasteryDetail() {
                       
                       {guide.rating?.average > 0 && (
                         <div className="flex items-center gap-1 mb-2">
-                          <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
-                          <span className="text-sm text-amber-300">{guide.rating.average.toFixed(1)}</span>
-                          <span className="text-xs text-stone-500">({guide.rating.count} reviews)</span>
+                          <Star className="w-4 h-4 fill-[var(--accent-primary)] text-[var(--accent-primary)]" />
+                          <span className="text-sm text-[var(--accent-primary)]">{guide.rating.average.toFixed(1)}</span>
+                          <span className="text-xs text-[var(--text-muted)]">({guide.rating.count} reviews)</span>
                         </div>
                       )}
                       
-                      <p className="text-sm text-stone-300 mb-3 line-clamp-2">{guide.bio}</p>
+                      <p className="text-sm text-[var(--text-secondary)] mb-3 line-clamp-2">{guide.bio}</p>
                       
-                      <div className="space-y-1 text-xs text-stone-400 mb-3">
+                      <div className="space-y-1 text-xs text-[var(--text-muted)] mb-3">
                         <p className="flex items-center gap-1">
                           <Briefcase className="w-3 h-3" /> {guide.experience} years experience
                         </p>
@@ -610,10 +610,10 @@ export default function MonasteryDetail() {
                       
                       {guide.pricing && (
                         <div className="flex items-center gap-2 mb-3 text-xs">
-                          <span className="px-2 py-1 rounded bg-stone-900/60 border border-stone-700/50 text-stone-300">
+                          <span className="px-2 py-1 rounded bg-[var(--bg-secondary)] border border-[var(--border-primary)] text-[var(--text-secondary)]">
                             <DollarSign className="w-3 h-3 inline" />₹{guide.pricing.hourlyRate}/hr
                           </span>
-                          <span className="px-2 py-1 rounded bg-stone-900/60 border border-stone-700/50 text-stone-300">
+                          <span className="px-2 py-1 rounded bg-[var(--bg-secondary)] border border-[var(--border-primary)] text-[var(--text-secondary)]">
                             ₹{guide.pricing.fullDayRate}/day
                           </span>
                         </div>
@@ -623,7 +623,7 @@ export default function MonasteryDetail() {
                         {guide.contactInfo?.phone && (
                           <a
                             href={`tel:${guide.contactInfo.phone}`}
-                            className="flex items-center gap-1 text-amber-300 hover:text-amber-200"
+                            className="flex items-center gap-1 text-[var(--accent-primary)] hover:text-[var(--accent-hover)]"
                           >
                             <Phone className="w-3 h-3" /> {guide.contactInfo.phone}
                           </a>
@@ -631,7 +631,7 @@ export default function MonasteryDetail() {
                         {guide.contactInfo?.email && (
                           <a
                             href={`mailto:${guide.contactInfo.email}`}
-                            className="flex items-center gap-1 text-amber-300 hover:text-amber-200"
+                            className="flex items-center gap-1 text-[var(--accent-primary)] hover:text-[var(--accent-hover)]"
                           >
                             <Mail className="w-3 h-3" /> {guide.contactInfo.email}
                           </a>

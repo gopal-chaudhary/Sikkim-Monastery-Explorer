@@ -1,0 +1,51 @@
+<!-- Fallback monastery image placeholder -->
+<svg width="800" height="600" viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="sky" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#87CEEB;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#E0F6FF;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="mountain" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#8B7355;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#6B5B45;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Sky background -->
+  <rect width="800" height="600" fill="url(#sky)"/>
+  
+  <!-- Mountains -->
+  <polygon points="0,400 200,200 400,350" fill="url(#mountain)" opacity="0.8"/>
+  <polygon points="300,450 500,250 700,400" fill="url(#mountain)" opacity="0.7"/>
+  <polygon points="600,500 800,300 800,500" fill="url(#mountain)" opacity="0.6"/>
+  
+  <!-- Monastery building -->
+  <rect x="320" y="280" width="160" height="120" fill="#FFF8DC" stroke="#8B4513" stroke-width="2"/>
+  
+  <!-- Roof -->
+  <polygon points="300,280 400,220 500,280" fill="#8B4513"/>
+  
+  <!-- Windows -->
+  <rect x="340" y="300" width="30" height="30" fill="#87CEEB" stroke="#8B4513"/>
+  <rect x="430" y="300" width="30" height="30" fill="#87CEEB" stroke="#8B4513"/>
+  <rect x="340" y="350" width="30" height="30" fill="#87CEEB" stroke="#8B4513"/>
+  <rect x="430" y="350" width="30" height="30" fill="#87CEEB" stroke="#8B4513"/>
+  
+  <!-- Door -->
+  <rect x="375" y="340" width="50" height="60" fill="#8B4513"/>
+  <circle cx="415" cy="370" r="3" fill="#FFD700"/>
+  
+  <!-- Prayer flags -->
+  <line x1="280" y1="220" x2="280" y2="180" stroke="#8B4513" stroke-width="2"/>
+  <rect x="275" y="180" width="10" height="15" fill="#FF6B6B"/>
+  <line x1="520" y1="220" x2="520" y2="180" stroke="#8B4513" stroke-width="2"/>
+  <rect x="515" y="180" width="10" height="15" fill="#4ECDC4"/>
+  
+  <!-- Text -->
+  <text x="400" y="550" font-family="Arial, sans-serif" font-size="24" fill="#333" text-anchor="middle">
+    Monastery Image
+  </text>
+  <text x="400" y="575" font-family="Arial, sans-serif" font-size="16" fill="#666" text-anchor="middle">
+    Not Available
+  </text>
+</svg>

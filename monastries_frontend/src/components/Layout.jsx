@@ -4,7 +4,12 @@ import {
   LogOut,
   User,
   Shield,
+  Sun,
+  Moon,
+  Menu,
+  X,
 } from 'lucide-react'
+import { useState } from 'react'
 import { BackToTop } from './BackToTop'
 import { SmartImage } from './SmartImage'
 import { CommandPalette } from './CommandPalette'
@@ -15,7 +20,8 @@ const HERO_IMAGE = 'https://www.esikkimtourism.in/wp-content/uploads/2018/10/cli
 export function Layout({ children, noHero }) {
   const { user, logout, isAdmin } = useAuth()
   const navigate = useNavigate()
-  const { theme, toggle } = useTheme()
+  const { theme, toggle, mounted } = useTheme()
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   const handleLogout = async () => {
     await logout()
@@ -23,87 +29,157 @@ export function Layout({ children, noHero }) {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--bg)] text-[var(--text)]">
+    <div className="min-h-screen bg-[var(--bg-primary)] text-[var(--text-primary)]">
       <CommandPalette isAdmin={isAdmin} />
-      <nav className="sticky top-0 z-50 glass border-b border-amber-900/30">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 flex items-center justify-between h-14 sm:h-16">
-          <Link to="/" className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-amber-500 to-rose-700 flex items-center justify-center shadow-lg shadow-amber-900/40">
-              <span className="font-heading text-xl font-semibold text-amber-50">ॐ</span>
+      
+      {/* Enhanced Navbar */}
+      <nav className="sticky top-0 z-50 glass border-b border-[var(--border-primary)] backdrop-blur-xl">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          <div className="flex items-center justify-between h-16 sm:h-18">
+            {/* Logo */}
+            <Link to="/" className="flex items-center gap-3 group">
+              <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-[var(--accent-primary)] to-[var(--rose-primary)] flex items-center justify-center shadow-lg shadow-[var(--accent-primary)]/20 group-hover:shadow-[var(--accent-primary)]/30 transition-all duration-300">
+                <span className="font-heading text-xl font-semibold text-white">ॐ</span>
+              </div>
+              <div className="hidden sm:block">
+                <p className="font-heading font-bold text-[var(--text-primary)] leading-tight group-hover:text-[var(--accent-primary)] transition-colors">Sikkim Monastery Explorer</p>
+                <p className="text-xs text-[var(--text-muted)]">Discover · Reflect · Journey</p>
+              </div>
+            </Link>
+
+            {/* Desktop Navigation */}
+            <div className="hidden lg:flex items-center gap-6">
+              <Link to="/explore" className="text-sm text-[var(--text-secondary)] hover:text-[var(--accent-primary)] transition-colors font-medium">Explore</Link>
+              <Link to="/map" className="text-sm text-[var(--text-secondary)] hover:text-[var(--accent-primary)] transition-colors font-medium">Map</Link>
+              {user && (
+                <>
+                  <Link to="/my-locations" className="text-sm text-[var(--text-secondary)] hover:text-[var(--accent-primary)] transition-colors font-medium">My Listings</Link>
+                  <Link to="/my-guide-profile" className="text-sm text-[var(--text-secondary)] hover:text-[var(--accent-primary)] transition-colors font-medium">Guide Profile</Link>
+                  <Link to="/contribute" className="text-sm text-[var(--text-secondary)] hover:text-[var(--accent-primary)] transition-colors font-medium">Contribute</Link>
+                </>
+              )}
             </div>
-            <div>
-              <p className="font-heading font-bold text-amber-50 leading-tight">Sikkim Monastery Explorer</p>
-              <p className="text-[10px] text-amber-200/80 hidden sm:block">Discover · Reflect · Journey</p>
-            </div>
-          </Link>
-          <div className="flex items-center gap-2 sm:gap-4">
-            <Link to="/explore" className="text-sm text-amber-100/90 hover:text-amber-50 transition hidden sm:inline">Explore</Link>
-            <Link to="/map" className="text-sm text-amber-100/90 hover:text-amber-50 transition">Map</Link>
-            <button
-              type="button"
-              onClick={toggle}
-              className="hidden sm:inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-stone-950/50 border border-amber-900/40 text-stone-300 hover:text-amber-100 hover:border-amber-700/50 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/40"
-              aria-label="Toggle light/dark mode"
-            >
-              <span className="text-xs">{theme === 'dark' ? 'Dark' : 'Light'}</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                window.dispatchEvent(new Event('cmdk:open'))
-              }}
-              className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-stone-950/50 border border-amber-900/40 text-stone-300 hover:text-amber-100 hover:border-amber-700/50 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/40"
-              aria-label="Open search (Command+K)"
-            >
-              <span className="text-xs">Search</span>
-              <kbd className="text-[10px] text-stone-400 border border-stone-700/60 rounded px-1.5 py-0.5">⌘ K</kbd>
-            </button>
-            {isAdmin && (
-              <Link to="/admin" className="flex items-center gap-1 text-sm text-amber-400 hover:text-amber-300">
-                <Shield className="w-4 h-4" /> Admin
-              </Link>
-            )}
-            {user ? (
-              <>
-                <Link to="/profile" className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-amber-900/30 text-amber-100 text-sm">
-                  <User className="w-4 h-4" /> {user.firstName}
+
+            {/* Right Side Actions */}
+            <div className="flex items-center gap-2 sm:gap-3">
+              {/* Theme Toggle */}
+              <button
+                type="button"
+                onClick={toggle}
+                className="btn-secondary p-2.5 rounded-lg hover:bg-[var(--bg-tertiary)] transition-all duration-200"
+                aria-label="Toggle light/dark mode"
+              >
+                {mounted && (
+                  theme === 'dark' ? 
+                    <Sun className="w-4 h-4 text-[var(--accent-primary)]" /> : 
+                    <Moon className="w-4 h-4 text-[var(--accent-primary)]" />
+                )}
+              </button>
+
+              {/* Search Button */}
+              <button
+                type="button"
+                onClick={() => window.dispatchEvent(new Event('cmdk:open'))}
+                className="hidden sm:flex items-center gap-2 px-3 py-2 rounded-lg bg-[var(--bg-secondary)] border border-[var(--border-primary)] hover:border-[var(--accent-border)] transition-all duration-200"
+                aria-label="Open search (Command+K)"
+              >
+                <span className="text-sm text-[var(--text-secondary)]">Search</span>
+                <kbd className="text-xs text-[var(--text-muted)] border border-[var(--border-secondary)] rounded px-1.5 py-0.5">⌘K</kbd>
+              </button>
+
+              {/* Admin Badge */}
+              {isAdmin && (
+                <Link to="/admin" className="hidden sm:flex items-center gap-1 px-3 py-2 rounded-lg bg-[var(--rose-bg)] border border-[var(--rose-border)] text-[var(--rose-primary)] text-sm font-medium hover:bg-[var(--rose-border)] transition-colors">
+                  <Shield className="w-4 h-4" /> Admin
                 </Link>
-                <Link to="/my-locations" className="text-sm text-amber-100/90 hover:text-amber-50 hidden sm:inline">My Listings</Link>
-                <Link to="/my-guide-profile" className="text-sm text-amber-100/90 hover:text-amber-50 hidden sm:inline">Guide Profile</Link>
-                <Link to="/contribute" className="text-sm text-amber-100/90 hover:text-amber-50 hidden sm:inline">Contribute</Link>
-                <button onClick={handleLogout} className="flex items-center gap-1 text-sm text-stone-400 hover:text-rose-400 transition">
-                  <LogOut className="w-4 h-4" /> Logout
-                </button>
-              </>
-            ) : (
-              <>
-                <Link to="/login" className="text-sm text-amber-100/90 hover:text-amber-50">Login</Link>
-                <Link to="/signup" className="px-4 py-2 rounded-full bg-amber-500/20 border border-amber-500/50 text-amber-100 text-sm font-medium hover:bg-amber-500/30 transition">Sign up</Link>
-              </>
-            )}
+              )}
+
+              {/* User Actions */}
+              {user ? (
+                <>
+                  <Link to="/profile" className="hidden sm:flex items-center gap-2 px-3 py-2 rounded-lg bg-[var(--accent-bg)] border border-[var(--accent-border)] text-[var(--accent-primary)] text-sm font-medium hover:bg-[var(--accent-border)] transition-colors">
+                    <User className="w-4 h-4" /> {user.firstName}
+                  </Link>
+                  <button 
+                    onClick={handleLogout} 
+                    className="hidden sm:flex items-center gap-1 px-3 py-2 text-sm text-[var(--text-muted)] hover:text-[var(--rose-primary)] transition-colors"
+                  >
+                    <LogOut className="w-4 h-4" /> Logout
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link to="/login" className="text-sm text-[var(--text-secondary)] hover:text-[var(--accent-primary)] font-medium transition-colors">Login</Link>
+                  <Link to="/signup" className="btn-primary text-sm px-4 py-2">Sign up</Link>
+                </>
+              )}
+
+              {/* Mobile Menu Toggle */}
+              <button
+                type="button"
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                className="lg:hidden p-2 rounded-lg hover:bg-[var(--bg-secondary)] transition-colors"
+                aria-label="Toggle menu"
+              >
+                {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              </button>
+            </div>
           </div>
+
+          {/* Mobile Menu */}
+          {mobileMenuOpen && (
+            <div className="lg:hidden py-4 border-t border-[var(--border-primary)]">
+              <div className="flex flex-col space-y-3">
+                <Link to="/explore" className="text-[var(--text-secondary)] hover:text-[var(--accent-primary)] transition-colors font-medium">Explore</Link>
+                <Link to="/map" className="text-[var(--text-secondary)] hover:text-[var(--accent-primary)] transition-colors font-medium">Map</Link>
+                {user && (
+                  <>
+                    <Link to="/my-locations" className="text-[var(--text-secondary)] hover:text-[var(--accent-primary)] transition-colors font-medium">My Listings</Link>
+                    <Link to="/my-guide-profile" className="text-[var(--text-secondary)] hover:text-[var(--accent-primary)] transition-colors font-medium">Guide Profile</Link>
+                    <Link to="/contribute" className="text-[var(--text-secondary)] hover:text-[var(--accent-primary)] transition-colors font-medium">Contribute</Link>
+                    <Link to="/profile" className="text-[var(--text-secondary)] hover:text-[var(--accent-primary)] transition-colors font-medium">Profile</Link>
+                    <button 
+                      onClick={handleLogout} 
+                      className="text-[var(--text-muted)] hover:text-[var(--rose-primary)] transition-colors text-left"
+                    >
+                      Logout
+                    </button>
+                  </>
+                )}
+                {!user && (
+                  <>
+                    <Link to="/login" className="text-[var(--text-secondary)] hover:text-[var(--accent-primary)] transition-colors font-medium">Login</Link>
+                    <Link to="/signup" className="btn-primary text-sm text-center">Sign up</Link>
+                  </>
+                )}
+              </div>
+            </div>
+          )}
         </div>
       </nav>
-        <BackToTop />
-        {!noHero && (
-        <header className="relative h-[42vh] min-h-[280px] flex flex-col justify-end pb-8 px-4 sm:px-6 overflow-hidden">
+
+      {/* Hero Section */}
+      <BackToTop />
+      {!noHero && (
+        <header className="relative h-[45vh] min-h-[320px] flex flex-col justify-end pb-12 px-4 sm:px-6 overflow-hidden">
           <SmartImage
             src={HERO_IMAGE}
             alt="Sikkim mountains"
             className="absolute inset-0 w-full h-full object-cover"
             loading="eager"
             decoding="async"
-            fetchpriority="high"
+            fetchPriority="high"
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-stone-950/40 to-stone-950" />
-          <div className="max-w-6xl mx-auto w-full">
-            <p className="text-amber-400/90 text-xs sm:text-sm tracking-widest uppercase">Buddhist Heritage of the Himalayas</p>
-            <h1 className="font-heading text-3xl sm:text-4xl md:text-5xl font-bold text-amber-50 mt-1">
+          <div className="absolute inset-0 bg-gradient-to-b from-[var(--bg-primary)]/20 via-[var(--bg-primary)]/60 to-[var(--bg-primary)]/80" />
+          <div className="max-w-6xl mx-auto w-full z-10 relative">
+            <p className="text-[var(--accent-light)] text-sm sm:text-base tracking-widest uppercase mb-3 font-medium">Buddhist Heritage of the Himalayas</p>
+            <h1 className="font-heading text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-[1.1] max-w-4xl">
               Find your next <span className="gradient-text">monastery</span>
             </h1>
           </div>
         </header>
       )}
+      
       <main>{children}</main>
     </div>
   )
