@@ -43,11 +43,15 @@ function normalizeMonastery(item) {
 
     const lat = item?.coordinates?.latitude;
     const lng = item?.coordinates?.longitude;
+    
+    // Mark as dataAvailable false if coordinates are missing
+    const hasCoordinates = Number.isFinite(lat) && Number.isFinite(lng);
+    const dataAvailable = item.dataAvailable !== false && hasCoordinates;
 
     return {
         name: item.name,
         link: item.link || null,
-        dataAvailable: item.dataAvailable !== false,
+        dataAvailable: dataAvailable,
         location: item.location || 'Sikkim, India',
         locationText: buildLocationText(item.location) || 'Sikkim, India',
         region: inferRegion(item),
@@ -64,10 +68,10 @@ function normalizeMonastery(item) {
         entryFee: item.entryFee || 'Free',
         bestTimeToVisit: item.bestTimeToVisit || 'October to May',
         nearbyAttractions: Array.isArray(item.nearbyAttractions) ? item.nearbyAttractions : [],
-        coordinates: {
-            latitude: Number.isFinite(lat) ? lat : null,
-            longitude: Number.isFinite(lng) ? lng : null
-        },
+        coordinates: hasCoordinates ? {
+            latitude: lat,
+            longitude: lng
+        } : null,
         altitude: Number.isFinite(item.altitude) ? item.altitude : 0,
         history: item.history || null,
         architecture: item.architecture || null,
