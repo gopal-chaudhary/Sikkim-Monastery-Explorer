@@ -97,25 +97,46 @@ contributionRouter.post('/contributions/submit', userAuth, async (req, res) => {
     }
 });
 
-// GET /contributions/my - Get user's contributions
+// GET /contributions/my - Get user's contributions with pagination
 contributionRouter.get('/contributions/my', userAuth, async (req, res) => {
     try {
+        const page = parseInt(req.query.page) || 1;
+        let limit = parseInt(req.query.limit) || 20;
+        limit = limit > 100 ? 100 : limit;
+        const skip = (page - 1) * limit;
+
         const contributions = await Contribution.find({
             contributedBy: req.user._id
-        }).sort({ createdAt: -1 });
+        }).sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(limit);
+
+        const total = await Contribution.countDocuments({
+            contributedBy: req.user._id
+        });
+
+        const allContributions = await Contribution.find({
+            contributedBy: req.user._id
+        });
 
         const stats = {
-            total: contributions.length,
-            pending: contributions.filter(c => c.status === 'pending').length,
-            approved: contributions.filter(c => c.status === 'approved').length,
-            rejected: contributions.filter(c => c.status === 'rejected').length,
-            totalPoints: contributions.reduce((sum, c) => sum + c.pointsAwarded, 0)
+            total: allContributions.length,
+            pending: allContributions.filter(c => c.status === 'pending').length,
+            approved: allContributions.filter(c => c.status === 'approved').length,
+            rejected: allContributions.filter(c => c.status === 'rejected').length,
+            totalPoints: allContributions.reduce((sum, c) => sum + c.pointsAwarded, 0)
         };
 
         res.json({
             success: true,
             data: contributions,
-            stats: stats
+            stats: stats,
+            pagination: {
+                total,
+                page,
+                limit,
+                pages: Math.ceil(total / limit)
+            }
         });
 
     } catch (error) {
