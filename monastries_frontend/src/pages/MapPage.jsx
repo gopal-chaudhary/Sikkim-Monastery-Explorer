@@ -47,6 +47,8 @@ export default function MapPage() {
   const [loadingLocations, setLoadingLocations] = useState(false)
   const [locationsError, setLocationsError] = useState(null)
   const [failedImages, setFailedImages] = useState(new Set())
+  const [locationPage, setLocationPage] = useState(1)
+  const [locationPagination, setLocationPagination] = useState(null)
   const businessLabel = userLocations.length === 1 ? 'business' : 'businesses'
 
   useEffect(() => {
@@ -57,11 +59,29 @@ export default function MapPage() {
     try {
       setLoadingLocations(true)
       setLocationsError(null)
-      const response = await locationAPI.getAllActiveLocations()
-      setUserLocations(response.data || [])
+      const response = await locationAPI.getAllActiveLocations(1, 20)
+      setUserLocations(response.data.data || [])
+      setLocationPagination(response.data.pagination || null)
+      setLocationPage(1)
     } catch (error) {
       console.error('Failed to fetch user locations:', error)
       setLocationsError('Could not load nearby businesses right now.')
+    } finally {
+      setLoadingLocations(false)
+    }
+  }
+
+  const loadMoreLocations = async () => {
+    try {
+      setLoadingLocations(true)
+      const nextPage = locationPage + 1
+      const response = await locationAPI.getAllActiveLocations(nextPage, 20)
+      setUserLocations(prev => [...prev, ...(response.data.data || [])])
+      setLocationPagination(response.data.pagination || null)
+      setLocationPage(nextPage)
+    } catch (error) {
+      console.error('Failed to load more locations:', error)
+      setLocationsError('Could not load more businesses.')
     } finally {
       setLoadingLocations(false)
     }
@@ -277,6 +297,15 @@ export default function MapPage() {
                 <li className="text-sm text-stone-400">No listings yet.</li>
               )}
             </ul>
+            {locationPagination && locationPage < locationPagination.pages && (
+              <button
+                onClick={loadMoreLocations}
+                disabled={loadingLocations}
+                className="mt-3 w-full px-4 py-2 bg-emerald-900/30 hover:bg-emerald-900/50 disabled:opacity-50 text-emerald-300 rounded-lg transition text-sm"
+              >
+                {loadingLocations ? 'Loading...' : `Load more (Page ${locationPage}/${locationPagination.pages})`}
+              </button>
+            )}
           </div>
 
           <div className="glass rounded-2xl p-5">

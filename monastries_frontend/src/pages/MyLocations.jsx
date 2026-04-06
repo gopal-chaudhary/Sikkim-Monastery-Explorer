@@ -16,6 +16,8 @@ export default function MyLocations() {
   const [locations, setLocations] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [page, setPage] = useState(1)
+  const [pagination, setPagination] = useState(null)
   const [editingLocation, setEditingLocation] = useState(null)
   const [savingEdit, setSavingEdit] = useState(false)
   const [editForm, setEditForm] = useState({
@@ -38,14 +40,15 @@ export default function MyLocations() {
       return
     }
     fetchLocations()
-  }, [user, navigate])
+  }, [user, navigate, page])
 
   const fetchLocations = async () => {
     try {
       setLoading(true)
       setError(null)
-      const response = await locationAPI.getMyLocations()
-      setLocations(response.data)
+      const response = await locationAPI.getMyLocations(page, 12)
+      setLocations(response.data.data || [])
+      setPagination(response.data.pagination || null)
     } catch (error) {
       toast.error('Failed to fetch locations')
       console.error(error)
@@ -63,7 +66,7 @@ export default function MyLocations() {
     try {
       await locationAPI.deleteLocation(id)
       toast.success('Location deleted successfully')
-      setLocations(locations.filter(loc => loc._id !== id))
+      fetchLocations()
     } catch {
       toast.error('Failed to delete location')
     }
@@ -351,6 +354,13 @@ export default function MyLocations() {
                 </div>
               </div>
             ))}
+            {pagination && pagination.pages > 1 && (
+              <div className="flex justify-center gap-2 mt-8">
+                <button type="button" disabled={page <= 1} onClick={() => setPage((p) => p - 1)} className="px-4 py-2 rounded-lg border border-amber-700/50 text-amber-100 disabled:opacity-50">Prev</button>
+                <span className="px-4 py-2 text-stone-400">Page {page} of {pagination.pages}</span>
+                <button type="button" disabled={page >= pagination.pages} onClick={() => setPage((p) => p + 1)} className="px-4 py-2 rounded-lg border border-amber-700/50 text-amber-100 disabled:opacity-50">Next</button>
+              </div>
+            )}
           </div>
         )}
 
