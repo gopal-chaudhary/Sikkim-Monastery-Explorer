@@ -91,31 +91,70 @@ locationRouter.post('/location/create', userAuth, async (req, res) => {
     }
 });
 
-// Get all user's locations
+// Get all user's locations with pagination
 locationRouter.get('/location/my-locations', userAuth, async (req, res) => {
     try {
+        const page = parseInt(req.query.page) || 1;
+        let limit = parseInt(req.query.limit) || 12;
+        limit = limit > 100 ? 100 : limit;
+        const skip = (page - 1) * limit;
+
         const locations = await UserLocation.find({ userId: req.user._id })
             .populate('subscriptionId', 'isActive nextRenewalDate monthlyAmount subscriptionStatus planType')
-            .sort({ createdAt: -1 });
+            .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(limit);
 
-        res.json(locations);
+        const total = await UserLocation.countDocuments({ userId: req.user._id });
+
+        res.json({
+            success: true,
+            data: locations,
+            pagination: {
+                total,
+                page,
+                limit,
+                pages: Math.ceil(total / limit)
+            }
+        });
     } catch (error) {
         console.error('Error fetching locations:', error);
         res.status(500).json({ message: error.message });
     }
 });
 
-// Get all active locations (for map display)
+// Get all active locations (for map display) with pagination
 locationRouter.get('/location/all-active', async (req, res) => {
     try {
+        const page = parseInt(req.query.page) || 1;
+        let limit = parseInt(req.query.limit) || 20;
+        limit = limit > 100 ? 100 : limit;
+        const skip = (page - 1) * limit;
+
         const locations = await UserLocation.find({
             subscriptionStatus: 'active',
             isApproved: true
         })
             .populate('userId', 'firstName lastName')
-            .sort({ createdAt: -1 });
+            .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(limit);
 
-        res.json(locations);
+        const total = await UserLocation.countDocuments({
+            subscriptionStatus: 'active',
+            isApproved: true
+        });
+
+        res.json({
+            success: true,
+            data: locations,
+            pagination: {
+                total,
+                page,
+                limit,
+                pages: Math.ceil(total / limit)
+            }
+        });
     } catch (error) {
         console.error('Error fetching active locations:', error);
         res.status(500).json({ message: error.message });

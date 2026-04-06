@@ -25,13 +25,13 @@ export const locationAPI = {
   createLocation: (locationData) =>
     api.post('/location/create', locationData),
 
-  // Get all user's locations
-  getMyLocations: () =>
-    api.get('/location/my-locations'),
+  // Get all user's locations with pagination
+  getMyLocations: (page = 1, limit = 12) =>
+    api.get(`/location/my-locations?page=${page}&limit=${limit}`),
 
-  // Get all active locations (for map)
-  getAllActiveLocations: () =>
-    api.get('/location/all-active'),
+  // Get all active locations (for map) with pagination
+  getAllActiveLocations: (page = 1, limit = 20) =>
+    api.get(`/location/all-active?page=${page}&limit=${limit}`),
 
   // Get single location by ID
   getLocationById: (id) =>

@@ -17,15 +17,18 @@ const statusConfig = {
 
 export default function MyContributions() {
   const [data, setData] = useState({ data: [], stats: null })
+  const [pagination, setPagination] = useState(null)
+  const [page, setPage] = useState(1)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const online = useOnlineStatus()
 
   useEffect(() => {
-    api.get('/contributions/my')
+    api.get(`/contributions/my?page=${page}&limit=20`)
       .then((res) => {
         setError(null)
         setData({ data: res.data.data || [], stats: res.data.stats || null })
+        setPagination(res.data.pagination || null)
       })
       .catch((err) => {
         const message = getErrorMessage(err)
@@ -33,7 +36,7 @@ export default function MyContributions() {
         toast.error(message)
       })
       .finally(() => setLoading(false))
-  }, [])
+  }, [page])
 
   return (
     <ProtectedRoute>
@@ -85,6 +88,13 @@ export default function MyContributions() {
                 )
               })}
             </ul>
+          )}
+          {pagination && pagination.pages > 1 && (
+            <div className="flex justify-center gap-2 mt-8">
+              <button type="button" disabled={page <= 1} onClick={() => setPage((p) => p - 1)} className="px-4 py-2 rounded-lg border border-amber-700/50 text-amber-100 disabled:opacity-50">Prev</button>
+              <span className="px-4 py-2 text-stone-400">Page {page} of {pagination.pages}</span>
+              <button type="button" disabled={page >= pagination.pages} onClick={() => setPage((p) => p + 1)} className="px-4 py-2 rounded-lg border border-amber-700/50 text-amber-100 disabled:opacity-50">Next</button>
+            </div>
           )}
         </div>
       </Layout>

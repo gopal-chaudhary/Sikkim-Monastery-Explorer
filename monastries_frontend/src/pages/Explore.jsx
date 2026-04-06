@@ -38,7 +38,7 @@ export default function Explore() {
       setLoading(true)
       setError(null)
       try {
-        const params = new URLSearchParams({ page, limit: 12, sortBy })
+        const params = new URLSearchParams({ page, limit: 6, sortBy })
         if (debouncedSearch.trim()) params.set('search', debouncedSearch.trim())
         if (region && region !== 'all') params.set('region', region)
         if (age) params.set('age', age)
