@@ -4,13 +4,13 @@ import { toast } from 'react-toastify'
 import { MapPin, Star, Hotel, Compass, BookOpen, Users, Church, Sparkles, Mountain, Clock, AlertTriangle, UserCircle, Phone, Mail, DollarSign, Award, Briefcase, Languages } from 'lucide-react'
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
 import L from 'leaflet'
-import 'leaflet/dist/leaflet.css'
 import { api, getErrorMessage, locationAPI, guideAPI } from '../api'
 import { Layout } from '../components/Layout'
 import ReviewSection from '../components/ReviewSection'
 import { SkeletonDetail } from '../components/SkeletonCard'
 import { SmartImage } from '../components/SmartImage'
 import { ErrorState, OfflineBanner } from '../components/States'
+import { InvalidateMapSize } from '../components/LeafletMapFix'
 
 const TYPE_META = {
   Hotel: { symbol: '🏨', color: '#3b82f6', label: 'Hotel' },
@@ -433,6 +433,7 @@ export default function MonasteryDetail() {
                 scrollWheelZoom 
                 className="h-full w-full"
               >
+                <InvalidateMapSize />
                 <TileLayer
                   attribution='&copy; OpenStreetMap contributors'
                   url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
