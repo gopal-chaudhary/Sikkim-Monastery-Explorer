@@ -2,13 +2,13 @@ import { useMemo, useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
 import L from 'leaflet'
-import 'leaflet/dist/leaflet.css'
 import { MapPin, Navigation, Store } from 'lucide-react'
 import { Layout } from '../components/Layout'
 import { useMonasteries } from '../context/MonasteryContext'
 import { locationAPI } from '../api'
 import { EmptyState, ErrorState, OfflineBanner } from '../components/States'
 import { SmartImage } from '../components/SmartImage'
+import { InvalidateMapSize } from '../components/LeafletMapFix'
 
 const DEFAULT_CENTER = [27.533, 88.512]
 const SIKKIM_BOUNDS = [
@@ -157,6 +157,7 @@ export default function MapPage() {
         ) : (
           <div className="rounded-2xl overflow-hidden border border-amber-900/40 relative z-0" style={{ height: '70vh' }}>
             <MapContainer center={mapCenter} zoom={9} scrollWheelZoom maxBounds={SIKKIM_BOUNDS} maxBoundsViscosity={1.0} minZoom={8} maxZoom={14} className="h-full w-full">
+              <InvalidateMapSize />
               <TileLayer
                 attribution='&copy; OpenStreetMap contributors'
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
