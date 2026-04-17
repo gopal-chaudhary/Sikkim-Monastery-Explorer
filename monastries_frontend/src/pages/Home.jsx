@@ -43,7 +43,7 @@ export default function Home() {
           alt="Sikkim monastery landscape"
           className="absolute inset-0 w-full h-full object-cover"
           loading="eager"
-          fetchpriority="high"
+          fetchPriority="high"
           optimizeWidth={1800}
         />
         <div className="absolute inset-0 bg-gradient-to-b from-stone-950/40 via-stone-950/75 to-stone-950" />

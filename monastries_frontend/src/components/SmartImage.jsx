@@ -40,7 +40,7 @@ export function SmartImage({
   className,
   loading = 'lazy',
   decoding = 'async',
-  fetchpriority,
+  fetchPriority,
   width,
   height,
   sizes,
@@ -58,7 +58,7 @@ export function SmartImage({
       className={className}
       loading={loading}
       decoding={decoding}
-      fetchpriority={fetchpriority}
+      fetchPriority={fetchPriority}
       width={width}
       height={height}
       sizes={sizes}

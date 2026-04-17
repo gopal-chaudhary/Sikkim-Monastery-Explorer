@@ -170,7 +170,7 @@ export default function MonasteryDetail() {
               alt={monastery.name}
               className="w-full h-full object-cover"
               loading="eager"
-              fetchpriority="high"
+              fetchPriority="high"
               optimizeWidth={1400}
             />
             <div className="absolute inset-0 bg-gradient-to-t from-stone-950 via-transparent to-transparent" />

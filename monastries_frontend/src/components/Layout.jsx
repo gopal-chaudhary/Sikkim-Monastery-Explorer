@@ -101,7 +101,7 @@ export function Layout({ children, noHero }) {
             className="absolute inset-0 w-full h-full object-cover"
             loading="eager"
             decoding="async"
-            fetchpriority="high"
+            fetchPriority="high"
           />
           <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-stone-950/40 to-stone-950" />
           <div className="max-w-6xl mx-auto w-full">
