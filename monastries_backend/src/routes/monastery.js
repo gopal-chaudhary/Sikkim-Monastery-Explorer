@@ -1,4 +1,5 @@
 const express = require('express');
+const config = require('../config/env');
 const monasteryRouter = express.Router();
 const Monastery = require('../models/monastery');
 const monasterySeedData = require('../data/monasteries');
@@ -109,7 +110,7 @@ monasteryRouter.get('/monasteries', async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
         let limit = parseInt(req.query.limit) || 50;
-        limit = limit > 100 ? 100 : limit;
+        limit = limit > config.pagination.maxPageSize ? config.pagination.maxPageSize : limit;
         const skip = (page - 1) * limit;
 
         // Build query

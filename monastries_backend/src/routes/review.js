@@ -1,4 +1,5 @@
 const express = require("express");
+const config = require("../config/env");
 const router = express.Router();
 const Review = require("../models/review");
 require("../models/user"); // ensure User schema is registered before populate() calls
@@ -25,11 +26,11 @@ router.post("/monasteries/:id/reviews", userAuth, async (req, res) => {
     if (!rating || rating < 1 || rating > 5) {
       return res.status(400).json({ success: false, message: "Rating must be between 1 and 5." });
     }
-    if (!comment || comment.trim().length < 5) {
-      return res.status(400).json({ success: false, message: "Comment must be at least 5 characters." });
+    if (!comment || comment.trim().length < config.review.minLength) {
+      return res.status(400).json({ success: false, message: `Comment must be at least ${config.review.minLength} characters.` });
     }
-    if (comment.trim().length > 1000) {
-      return res.status(400).json({ success: false, message: "Comment must be 1000 characters or fewer." });
+    if (comment.trim().length > config.review.maxLength) {
+      return res.status(400).json({ success: false, message: `Comment must be ${config.review.maxLength} characters or fewer.` });
     }
 
     // Upsert: one review per user per monastery

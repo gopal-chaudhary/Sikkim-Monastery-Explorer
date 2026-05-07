@@ -5,6 +5,7 @@ import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import { AuthProvider } from './context/AuthContext'
 import { MonasteryProvider } from './context/MonasteryContext'
+import { AIProvider } from './context/AIContext'
 import './App.css'
 
 const Home = lazy(() => import('./pages/Home'))
@@ -25,6 +26,7 @@ const BecomeGuide = lazy(() => import('./pages/BecomeGuide'))
 const MyGuideProfile = lazy(() => import('./pages/MyGuideProfile'))
 const ListBusiness = lazy(() => import('./pages/ListBusiness'))
 const Status = lazy(() => import('./pages/Status'))
+const AIChatAssistant = lazy(() => import('./pages/AIChatAssistant'))
 const NotFound = lazy(() => import('./pages/NotFound'))
 
 function RouteLoading() {
@@ -74,6 +76,7 @@ function AnimatedRoutes() {
             <Route path="/contribute" element={<Contribute />} />
             <Route path="/leaderboard" element={<Leaderboard />} />
             <Route path="/admin" element={<Admin />} />
+            <Route path="/ai-chat" element={<AIChatAssistant />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>
@@ -86,22 +89,24 @@ export default function App() {
   return (
     <AuthProvider>
       <MonasteryProvider>
-        <BrowserRouter>
-          <AnimatedRoutes />
-          <ToastContainer
-            position="top-right"
-            autoClose={4000}
-            hideProgressBar={false}
-            newestOnTop
-            closeOnClick
-            rtl={false}
-            pauseOnFocusLoss
-            draggable
-            pauseOnHover
-            theme="dark"
-            toastStyle={{ background: '#1c1917', color: '#fafaf9', border: '1px solid rgba(245,158,11,0.3)' }}
-          />
-        </BrowserRouter>
+        <AIProvider>
+          <BrowserRouter>
+            <AnimatedRoutes />
+            <ToastContainer
+              position="top-right"
+              autoClose={4000}
+              hideProgressBar={false}
+              newestOnTop
+              closeOnClick
+              rtl={false}
+              pauseOnFocusLoss
+              draggable
+              pauseOnHover
+              theme="dark"
+              toastStyle={{ background: '#1c1917', color: '#fafaf9', border: '1px solid rgba(245,158,11,0.3)' }}
+            />
+          </BrowserRouter>
+        </AIProvider>
       </MonasteryProvider>
     </AuthProvider>
   )

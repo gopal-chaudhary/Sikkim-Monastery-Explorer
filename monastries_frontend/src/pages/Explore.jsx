@@ -8,6 +8,7 @@ import { SkeletonCard } from '../components/SkeletonCard'
 import { SmartImage } from '../components/SmartImage'
 import { EmptyState, ErrorState, OfflineBanner } from '../components/States'
 import { useMonasteries } from '../context/MonasteryContext'
+import { AIRecommendations } from '../components/AIRecommendations'
 
 export default function Explore() {
   const [searchParams] = useSearchParams()
@@ -181,6 +182,7 @@ export default function Explore() {
             )}
           </>
         )}
+        <AIRecommendations />
       </div>
     </Layout>
   )

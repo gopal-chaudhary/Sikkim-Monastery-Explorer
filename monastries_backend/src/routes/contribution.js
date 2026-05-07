@@ -1,4 +1,5 @@
 const express = require('express');
+const config = require('../config/env');
 const contributionRouter = express.Router();
 const Contribution = require('../models/contribution');
 const Monastery = require('../models/monastery');
@@ -102,7 +103,7 @@ contributionRouter.get('/contributions/my', userAuth, async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
         let limit = parseInt(req.query.limit) || 20;
-        limit = limit > 100 ? 100 : limit;
+        limit = limit > config.pagination.maxPageSize ? config.pagination.maxPageSize : limit;
         const skip = (page - 1) * limit;
 
         const contributions = await Contribution.find({
@@ -301,7 +302,7 @@ contributionRouter.post('/contributions/:id/review', userAuth, async (req, res) 
             await newMonastery.save();
 
             // Award points to contributor
-            const points = pointsToAward || 100; // Default 100 points
+            const points = pointsToAward || config.contribution.defaultPoints;
             await User.findByIdAndUpdate(contribution.contributedBy, {
                 $inc: { contributionPoints: points }
             });
@@ -310,13 +311,13 @@ contributionRouter.post('/contributions/:id/review', userAuth, async (req, res) 
             const user = await User.findById(contribution.contributedBy);
             const newBadges = [...user.badges];
             
-            if (user.contributionPoints + points >= 100 && !newBadges.includes('Explorer')) {
+            if (user.contributionPoints + points >= config.contribution.explorerThreshold && !newBadges.includes('Explorer')) {
                 newBadges.push('Explorer');
             }
-            if (user.contributionPoints + points >= 500 && !newBadges.includes('Pathfinder')) {
+            if (user.contributionPoints + points >= config.contribution.pathfinderThreshold && !newBadges.includes('Pathfinder')) {
                 newBadges.push('Pathfinder');
             }
-            if (user.contributionPoints + points >= 1000 && !newBadges.includes('Guardian')) {
+            if (user.contributionPoints + points >= config.contribution.guardianThreshold && !newBadges.includes('Guardian')) {
                 newBadges.push('Guardian');
             }
 

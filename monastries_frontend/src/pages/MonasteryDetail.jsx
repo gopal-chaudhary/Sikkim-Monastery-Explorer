@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { toast } from 'react-toastify'
-import { MapPin, Star, Hotel, Compass, BookOpen, Users, Church, Sparkles, Mountain, Clock, AlertTriangle, UserCircle, Phone, Mail, DollarSign, Award, Briefcase, Languages } from 'lucide-react'
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
+import { MapPin, Star, Hotel, Compass, BookOpen, Users, Church, Sparkles, Mountain, Clock, AlertTriangle, UserCircle, Phone, Mail, DollarSign, Award, Briefcase, Languages, ExternalLink } from 'lucide-react'
+import { MapContainer, TileLayer, Marker, Popup, Polyline } from 'react-leaflet'
 import L from 'leaflet'
 import { api, getErrorMessage, locationAPI, guideAPI } from '../api'
 import { Layout } from '../components/Layout'
@@ -25,6 +25,34 @@ const TYPE_META = {
 
 function getTypeMeta(type) {
   return TYPE_META[type] || TYPE_META.Other
+}
+
+// Calculate distance between two coordinates using Haversine formula
+function calculateDistance(lat1, lon1, lat2, lon2) {
+  const R = 6371 // Radius of the Earth in km
+  const dLat = (lat2 - lat1) * Math.PI / 180
+  const dLon = (lon2 - lon1) * Math.PI / 180
+  const a = 
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+    Math.sin(dLon / 2) * Math.sin(dLon / 2)
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+  const distance = R * c // Distance in km
+  return distance
+}
+
+// Format distance for display
+function formatDistance(km) {
+  if (km < 1) {
+    return `${Math.round(km * 1000)}m`
+  }
+  return `${km.toFixed(2)}km`
+}
+
+// Open coordinates in Google Maps
+function openInGoogleMaps(lat, lng, name) {
+  const url = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}&query_place_id=${encodeURIComponent(name)}`
+  window.open(url, '_blank', 'noopener,noreferrer')
 }
 
 export default function MonasteryDetail() {
@@ -455,59 +483,113 @@ export default function MonasteryDetail() {
                   <Popup>
                     <div className="text-sm max-w-xs">
                       <p className="font-semibold text-amber-600 mb-1">{monastery.name}</p>
-                      <p className="text-xs text-stone-600">{monastery.location?.district || monastery.location?.village || 'Sikkim'}</p>
+                      <p className="text-xs text-stone-600 mb-2">{monastery.location?.district || monastery.location?.village || 'Sikkim'}</p>
+                      <button
+                        onClick={() => openInGoogleMaps(monastery.coordinates.latitude, monastery.coordinates.longitude, monastery.name)}
+                        className="flex items-center gap-1 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded-lg transition"
+                      >
+                        <ExternalLink className="w-3 h-3" />
+                        Open in Google Maps
+                      </button>
                     </div>
                   </Popup>
                 </Marker>
 
-                {/* User Locations (Businesses) */}
+                {/* Polylines and User Locations (Businesses) */}
                 {userLocations.map((location) => {
                   if (!location.location?.coordinates?.[1] || !location.location?.coordinates?.[0]) return null
+                  
+                  const businessLat = location.location.coordinates[1]
+                  const businessLng = location.location.coordinates[0]
+                  const distance = calculateDistance(
+                    monastery.coordinates.latitude,
+                    monastery.coordinates.longitude,
+                    businessLat,
+                    businessLng
+                  )
                   const typeMeta = getTypeMeta(location.type)
                   
                   return (
-                    <Marker
-                      key={location._id}
-                      position={[location.location.coordinates[1], location.location.coordinates[0]]}
-                      icon={L.divIcon({
-                        html: `
-                          <div class="w-10 h-10 rounded-full border-2 shadow-lg cursor-pointer transform hover:scale-110 transition-transform" style="border-color:${typeMeta.color}; background:linear-gradient(135deg, ${typeMeta.color} 0%, ${typeMeta.color}dd 100%); display:flex; align-items:center; justify-content:center; font-size:18px; box-shadow: 0 2px 8px rgba(0,0,0,0.25);">
-                            <span style="filter: drop-shadow(0 1px 1px rgba(0,0,0,0.2));">${typeMeta.symbol}</span>
+                    <div key={location._id}>
+                      {/* Polyline from monastery to business */}
+                      <Polyline
+                        positions={[
+                          [monastery.coordinates.latitude, monastery.coordinates.longitude],
+                          [businessLat, businessLng]
+                        ]}
+                        pathOptions={{
+                          color: typeMeta.color,
+                          weight: 2,
+                          opacity: 0.6,
+                          dashArray: '5, 10'
+                        }}
+                      />
+                      
+                      {/* Business Marker */}
+                      <Marker
+                        position={[businessLat, businessLng]}
+                        icon={L.divIcon({
+                          html: `
+                            <div class="w-10 h-10 rounded-full border-2 shadow-lg cursor-pointer transform hover:scale-110 transition-transform" style="border-color:${typeMeta.color}; background:linear-gradient(135deg, ${typeMeta.color} 0%, ${typeMeta.color}dd 100%); display:flex; align-items:center; justify-content:center; font-size:18px; box-shadow: 0 2px 8px rgba(0,0,0,0.25);">
+                              <span style="filter: drop-shadow(0 1px 1px rgba(0,0,0,0.2));">${typeMeta.symbol}</span>
+                            </div>
+                          `,
+                          iconSize: [40, 40],
+                          className: 'custom-location-icon',
+                        })}
+                      >
+                        <Popup>
+                          <div className="text-sm max-w-xs">
+                            {location.imageUrl && (
+                              <SmartImage
+                                src={location.imageUrl}
+                                alt={location.name}
+                                className="w-full h-24 object-cover rounded mb-2"
+                                optimizeWidth={500}
+                              />
+                            )}
+                            <p className="font-semibold text-sm mb-1">{location.name}</p>
+                            <p className="text-xs font-medium mb-1" style={{ color: typeMeta.color }}>
+                              {typeMeta.symbol} {location.type || 'Other'}
+                            </p>
+                            <p className="text-xs text-stone-600 mb-1">{location.location.address}</p>
+                            <p className="text-xs font-semibold text-blue-600 mb-2">
+                              📍 {formatDistance(distance)} from monastery
+                            </p>
+                            {location.phone && (
+                              <p className="text-xs mb-2">📞 {location.phone}</p>
+                            )}
+                            <div className="flex gap-2">
+                              <Link 
+                                to={`/location/${location._id}`} 
+                                className="flex-1 text-center px-2 py-1 bg-stone-700 hover:bg-stone-600 text-white text-xs rounded transition"
+                              >
+                                View Details
+                              </Link>
+                              <button
+                                onClick={() => openInGoogleMaps(businessLat, businessLng, location.name)}
+                                className="flex items-center gap-1 px-2 py-1 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded transition"
+                              >
+                                <ExternalLink className="w-3 h-3" />
+                                Maps
+                              </button>
+                            </div>
                           </div>
-                        `,
-                        iconSize: [40, 40],
-                        className: 'custom-location-icon',
-                      })}
-                    >
-                      <Popup>
-                        <div className="text-sm max-w-xs">
-                          {location.imageUrl && (
-                            <SmartImage
-                              src={location.imageUrl}
-                              alt={location.name}
-                              className="w-full h-24 object-cover rounded mb-2"
-                              optimizeWidth={500}
-                            />
-                          )}
-                          <p className="font-semibold text-sm">{location.name}</p>
-                          <p className="text-xs font-medium" style={{ color: typeMeta.color }}>{typeMeta.symbol} {location.type || 'Other'}</p>
-                          <p className="text-xs mt-1">{location.location.address}</p>
-                          {location.phone && (
-                            <p className="text-xs mt-1">Ph: {location.phone}</p>
-                          )}
-                          <Link to={`/location/${location._id}`} className="text-xs text-blue-700 underline mt-2 inline-block">
-                            View details
-                          </Link>
-                        </div>
-                      </Popup>
-                    </Marker>
+                        </Popup>
+                      </Marker>
+                    </div>
                   )
                 })}
               </MapContainer>
             </div>
-            <p className="text-stone-400 text-xs mt-2">
-              {userLocations.length} nearby {userLocations.length === 1 ? 'business' : 'businesses'} shown on map
-            </p>
+            <div className="mt-3 flex items-center justify-between text-xs">
+              <p className="text-stone-400">
+                {userLocations.length} nearby {userLocations.length === 1 ? 'business' : 'businesses'} shown with distances
+              </p>
+              <p className="text-stone-500">
+                Lines show paths from monastery to each location
+              </p>
+            </div>
           </section>
         )}
 

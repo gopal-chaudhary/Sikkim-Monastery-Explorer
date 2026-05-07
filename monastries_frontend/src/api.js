@@ -3,10 +3,22 @@ import axios from 'axios'
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3777'
 
 export const api = axios.create({
-  baseURL: API_URL,
+  baseURL: `${API_URL}/api/v1`,
   withCredentials: true,
   headers: { 'Content-Type': 'application/json' },
 })
+
+// Add response interceptor to handle new response format
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    // Handle rate limiting
+    if (error.response?.status === 429) {
+      console.warn('Rate limit exceeded:', error.response.data?.message)
+    }
+    return Promise.reject(error)
+  }
+)
 
 // Parse error response (backend may send JSON or text)
 export function getErrorMessage(err) {
@@ -136,5 +148,52 @@ export const reviewAPI = {
   // Delete own review
   deleteReview: (monasteryId) =>
     api.delete(`/monasteries/${monasteryId}/reviews`),
+}
+
+// ===== AI APIs =====
+
+export const aiAPI = {
+  // Multi-turn chat with conversation history
+  chat: (message, monasteryContext = null, conversationHistory = []) =>
+    api.post('/ai/chat', { message, monasteryContext, conversationHistory }),
+
+  // SSE streaming chat — returns URL for EventSource
+  streamUrl: (message, context, history) => {
+    const base = import.meta.env.VITE_API_URL || 'http://localhost:3777'
+    const params = new URLSearchParams({
+      message,
+      monasteryContext: JSON.stringify(context || null),
+      history: JSON.stringify(history || []),
+    })
+    return `${base}/api/v1/ai/stream?${params}`
+  },
+
+  // AI-powered monastery recommendations
+  recommend: (userPreferences) =>
+    api.post('/ai/recommend', { userPreferences }),
+
+  // Analyse a monastery image (base64)
+  analyzeImage: (imageBase64, metadata = {}) =>
+    api.post('/ai/analyze-image', { imageBase64, metadata }),
+
+  // Generate monastery description
+  generateDescription: (monasteryData) =>
+    api.post('/ai/generate-description', { monasteryData }),
+
+  // AI search suggestions
+  suggest: (query, type = 'general') =>
+    api.post('/ai/suggest', { query, type }),
+
+  // Get a monastery fact
+  getFact: (monasteryName) =>
+    api.get(`/ai/fact/${encodeURIComponent(monasteryName)}`),
+
+  // Rate an AI interaction
+  rateInteraction: (interactionId, rating, feedback = '') =>
+    api.post(`/ai/rate/${interactionId}`, { rating, feedback }),
+
+  // Get AI interaction history
+  getHistory: (page = 1, limit = 20) =>
+    api.get(`/ai/history?page=${page}&limit=${limit}`),
 }
 

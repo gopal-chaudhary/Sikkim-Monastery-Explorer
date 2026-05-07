@@ -1,4 +1,5 @@
 const express = require('express');
+const config = require('../config/env');
 const locationRouter = express.Router();
 const UserLocation = require('../models/userLocation');
 const LocationSubscription = require('../models/locationSubscription');
@@ -96,7 +97,7 @@ locationRouter.get('/location/my-locations', userAuth, async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
         let limit = parseInt(req.query.limit) || 12;
-        limit = limit > 100 ? 100 : limit;
+        limit = limit > config.pagination.maxPageSize ? config.pagination.maxPageSize : limit;
         const skip = (page - 1) * limit;
 
         const locations = await UserLocation.find({ userId: req.user._id })
@@ -128,7 +129,7 @@ locationRouter.get('/location/all-active', async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
         let limit = parseInt(req.query.limit) || 20;
-        limit = limit > 100 ? 100 : limit;
+        limit = limit > config.pagination.maxPageSize ? config.pagination.maxPageSize : limit;
         const skip = (page - 1) * limit;
 
         const locations = await UserLocation.find({

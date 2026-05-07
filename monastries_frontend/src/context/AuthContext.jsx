@@ -11,8 +11,9 @@ export function AuthProvider({ children }) {
   async function fetchUser() {
     try {
       const { data } = await api.get('/profile')
-      setUser(data)
-      return data
+      const userData = data.user || data.data || data
+      setUser(userData)
+      return userData
     } catch {
       setUser(null)
       return null
@@ -50,7 +51,8 @@ export function AuthProvider({ children }) {
 
   const updateProfile = async (body) => {
     const { data } = await api.patch('/profile/edit', body)
-    setUser((u) => (u ? { ...u, ...data.data } : null))
+    const updatedUser = data.user || data.data || data
+    setUser((u) => (u ? { ...u, ...updatedUser } : null))
     return data
   }
 

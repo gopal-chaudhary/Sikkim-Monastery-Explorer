@@ -16,7 +16,6 @@ const HERO_IMAGE = 'https://www.esikkimtourism.in/wp-content/uploads/2018/10/cli
 export function Layout({ children, noHero }) {
   const { user, logout, isAdmin } = useAuth()
   const navigate = useNavigate()
-  const { theme, toggle } = useTheme()
 
   const handleLogout = async () => {
     try {
@@ -47,14 +46,7 @@ export function Layout({ children, noHero }) {
           <div className="flex items-center gap-2 sm:gap-4">
             <Link to="/explore" className="text-sm text-amber-100/90 hover:text-amber-50 transition hidden sm:inline">Explore</Link>
             <Link to="/map" className="text-sm text-amber-100/90 hover:text-amber-50 transition">Map</Link>
-            <button
-              type="button"
-              onClick={toggle}
-              className="hidden sm:inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-stone-950/50 border border-amber-900/40 text-stone-300 hover:text-amber-100 hover:border-amber-700/50 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/40"
-              aria-label="Toggle light/dark mode"
-            >
-              <span className="text-xs">{theme === 'dark' ? 'Dark' : 'Light'}</span>
-            </button>
+            <Link to="/ai-chat" className="text-sm text-amber-100/90 hover:text-amber-50 transition hidden sm:inline">AI Guide</Link>
             <button
               type="button"
               onClick={() => {

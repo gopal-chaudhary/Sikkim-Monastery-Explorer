@@ -9,29 +9,16 @@ function applyTheme(theme) {
 }
 
 export function ThemeProvider({ children }) {
-  const [theme, setTheme] = useState(() => {
-    const stored = typeof localStorage !== 'undefined' ? localStorage.getItem('theme') : null
-    if (stored === 'light' || stored === 'dark') return stored
-    const prefersDark = typeof window !== 'undefined'
-      ? window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
-      : true
-    return prefersDark ? 'dark' : 'light'
-  })
+  const [theme] = useState('dark')
 
   useEffect(() => {
-    applyTheme(theme)
-    try {
-      localStorage.setItem('theme', theme)
-    } catch {
-      // ignore
-    }
-  }, [theme])
+    applyTheme('dark')
+  }, [])
 
   const value = useMemo(() => ({
-    theme,
-    setTheme,
-    toggle: () => setTheme((t) => (t === 'dark' ? 'light' : 'dark')),
-  }), [theme])
+    theme: 'dark',
+    setTheme: () => {},
+  }), [])
 
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>
 }

@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const validator = require("validator");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const config = require("../config/env");
 
 const userSchema = new mongoose.Schema({
     firstName:{
@@ -108,8 +109,8 @@ userSchema.methods.getJWT = async function (){
     //This function will have a very closely related to user schema as every user has their own
     //different json web token 
     const user = this;
-    const token = await jwt.sign({_id:user._id},process.env.JWT_SECRET,{
-        expiresIn:"7d",
+    const token = await jwt.sign({_id:user._id}, config.jwtSecret, {
+        expiresIn: config.jwtExpiresIn,
     });
     return token;
 };
